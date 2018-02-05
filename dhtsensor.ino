@@ -24,8 +24,8 @@
 
 // Constants
 // DHT22 specific
-#define DHTPIN 2     // Temp & Humid Sensor
-#define DHTTYPE DHT22   // DHT 22 signal pin
+#define DHTPIN 2     // DHT 22 signal pin
+#define DHTTYPE DHT22   // Sensor Type
 
 // Dust Sensor Specific
 
@@ -34,8 +34,8 @@
 
 
 // instantiate DHT
-DHT dht(DHTPIN, DHTTYPE); // Instantiate dht
-SMPWM01A dust; // Instantiate dust sensor
+DHT dht22(DHTPIN, DHTTYPE); // Instantiate dht
+SMPWM01A dustsnsr; // Instantiate dust sensor
 
 float hum;  //Stores humidity value
 float temp; //Stores temperature value
@@ -63,8 +63,8 @@ float start, end; // for timing purposes
 void setup()
 {
   Serial.begin(9600);
-  dht.begin();
-  dust.begin();
+  dht22.begin();
+  dustsnsr.begin();
 }
 
 void loop()
@@ -81,16 +81,16 @@ void loop()
   memset(d25b, 0, 4);
   memset(d100b, 0, 4);
   /////// char
-//  memset(text, 0, 501);
-//  memset(t, 0, 11);
-//  memset(h, 0, 11);
-//  memset(d25, 0, 11);
-//  memset(d100, 0, 11);
+  memset(text, 0, 501);
+  memset(t, 0, 11);
+  memset(h, 0, 11);
+  memset(d25, 0, 11);
+  memset(d100, 0, 11);
   // Read from the sensors
-  hum = dht.readHumidity();
-  temp = dht.readTemperature();
-  dust25 = dust.getPM2();
-  dust100 = dust.getPM10();
+  hum = dht22.readHumidity();
+  temp = dht22.readTemperature();
+  dust25 = dustsnsr.getPM2();
+  dust100 = dustsnsr.getPM10();
 
   ///// byte arrangement for data entry (might not be in right order at this time)
   memcpy(hb, &hum, 4);
@@ -110,12 +110,12 @@ void loop()
   //Print variables to determine if values are acquired correctly
 
   // %f not supported!
-//  dtostrf(temp, 10, 4, t);
-//  dtostrf(hum, 10, 4, h);
-//  dtostrf(dust25, 10, 4, d25);
-//  dtostrf(dust100, 10, 4, d100);
-//  snprintf(text, sizeof(text), "Humidity: %s percent,\nTemperature: %s C\n, PM2.5: %sg/um^3\n, PM10: %sg/um^3\n", h, t, d25, d100);
-//  Serial.println(text);
+  dtostrf(temp, 10, 4, t);
+  dtostrf(hum, 10, 4, h);
+  dtostrf(dust25, 10, 4, d25);
+  dtostrf(dust100, 10, 4, d100);
+  snprintf(text, sizeof(text), "Humidity: %s percent,\nTemperature: %s C\n, PM2.5: %sg/um^3\n, PM10: %sg/um^3\n", h, t, d25, d100);
+  Serial.println(text);
 
 
   end = millis();
