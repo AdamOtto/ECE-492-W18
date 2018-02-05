@@ -8,7 +8,7 @@
  *      https://github.com/vancegroup-mirrors/avr-libc (Not currently used)
  *    Modified from: None
  * Additional Notes: 
- * 1. Note this code is currently a test code for the sensors. While the code is not modified from any particular codes, 
+ * 1. Note this code is currently a test code for the sensors. While the code is not modified from any particular code bases, 
  * initialisation and the usage of the functions for reading from the sensors were learned from the provided example code
  * in the library of the correponding devices. 
  * 2. It is not known if the dust sensor code actually works yet, as we are wating for the header for wiring.
