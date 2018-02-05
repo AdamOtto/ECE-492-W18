@@ -11,7 +11,7 @@ var sticky;
 function init(){
 	console.log("init started...");
 	window.onscroll = function() {stickyFunc()};
-	mapElement = document.getElementById("googleMap");
+	mapElement = document.getElementById("fixedDiv");
 	sticky = mapElement.offsetTop;
 	initContent();	
 	console.log("init end.");
