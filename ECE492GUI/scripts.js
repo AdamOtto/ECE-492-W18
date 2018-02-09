@@ -2,16 +2,6 @@
  * @author adamo
  */
 
-$(document).ready(function() {
-	$.ajax({	
-		type: "GET",	
-		url: "test.csv",	
-		dataType: "text",	
-		success: function(data) {csvFunction(data);}	
-	});
-});
-
-var csvData;
 var map;
 //window.onscroll = function() {stickyFunc()};
 var mapElement;
@@ -23,8 +13,7 @@ function init(){
 	window.onscroll = function() {stickyFunc()};
 	mapElement = document.getElementById("fixedDiv");
 	sticky = mapElement.offsetTop;
-	initMap();
-	initContent(csvData);
+	initContent();	
 	console.log("init end.");
 }
 
@@ -34,70 +23,48 @@ function initMap() {
 	    center:new google.maps.LatLng(53.5444,-113.4909),
 	    zoom:5,
 	};
-	//var marker = new google.maps.Marker({position:center});
+//	var marker = new google.maps.Marker({position:center});
 	
-	map = new google.maps.Map(document.getElementById("googleMap"),mapProp);
+	map=new google.maps.Map(document.getElementById("googleMap"),mapProp);
 	
-	//marker.setMap(map);
+	var marker = new google.maps.Marker({
+      position: center,
+      map: map,
+      title: 'Click to zoom'
+        });
+	
+	map.addListener('center_changed', function() {
+          // 3 seconds after the center of the map has changed, pan back to the
+          // marker.
+          window.setTimeout(function() {
+            map.panTo(marker.getPosition());
+          }, 3000);
+        });
+	
+	 var contentString = 'remote station 1';
+	
+	var infowindow = new google.maps.InfoWindow({
+    content: contentString
+    });
+	
+	marker.addListener('click',function() {
+		 infowindow.open(map, marker);
+	});
+	
 }
 
 
-function initContent(data) {
-	//Code help from -> https://code.tutsplus.com/tutorials/parsing-a-csv-file-with-javascript--cms-25626
+function initContent() {
 	console.log("initContent started...");
-	var htmlCode = "<table>";
-	var allRows = data.split(/\r?\n|\r/);
+	var htmlCode = "";
 	
-	for (var row = 0; row < allRows.length; row++) {
-		if (row === 0) {
-			htmlCode += '<thead>';
-			htmlCode += '<tr>';
-		}
-		else {
-			htmlCode += '<tr>';
-		}
-		
-		var rowCells = allRows[row].split(',');
-		var latitude = 0;
-		var longitude = 0;
-		for (var rowCell = 0; rowCell < rowCells.length; rowCell++) {
-			if (row === 0) {
-				htmlCode += '<th>';
-				htmlCode += rowCells[rowCell];
-				htmlCode += '</th>';
-			} else {
-				
-				if(rowCell == 1)
-					latitude = parseInt( rowCells[rowCell] );
-				if(rowCell == 2)
-					longitude = parseInt( rowCells[rowCell] );
-				htmlCode += '<td>';
-				htmlCode += rowCells[rowCell];
-				htmlCode += '</td>';
-			}
-		}
-		var pos = new google.maps.LatLng(latitude, longitude);
-		var mark = new google.maps.Marker({position:pos});
-		mark.setMap(map);
-		
-		if (row === 0) {
-			htmlCode += '</tr>';
-			htmlCode += '</thead>';
-			htmlCode += '<tbody>';
-		} else {
-		  htmlCode += '</tr>';
-		}
+	for(var i = 0; i < 100; i++)
+	{		
+		htmlCode += "<p>Content goes here.</p>";
 	}
-	htmlCode += '</tbody>';
-	htmlCode += '</table>';
+	
 	document.getElementById('content').innerHTML = htmlCode;
 	console.log("initContent end.");
-}
-
-function csvFunction(data)
-{
-	console.log(data);
-	csvData = data;
 }
 
 function stickyFunc(){
@@ -106,4 +73,23 @@ function stickyFunc(){
  	} else {
 		mapElement.classList.remove("sticky");
 	}
+}
+
+function myFunction() {
+	console.log("hello inside myFunction");
+    document.getElementById("myDropdown").classList.toggle("show");
+}
+
+window.onclick = function(event) {
+  if (!event.target.matches('.dropbtn')) {
+
+    var dropdowns = document.getElementsByClassName("dropdown-content");
+    var i;
+    for (i = 0; i < dropdowns.length; i++) {
+      var openDropdown = dropdowns[i];
+      if (openDropdown.classList.contains('show')) {
+        openDropdown.classList.remove('show');
+      }
+    }
+  }
 }

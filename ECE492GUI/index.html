@@ -7,17 +7,27 @@
         <title>New Web Project</title>
     </head>
     <body onload="init()">
-    	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-    	
         <h1>Base Station GUI</h1>
-        
-        <script src="scripts.js"></script>		
-        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB1-4XWM8LnJMhGsl4XIvcSyrU_pacYTxc" type="text/javascript"></script>
+		
+		<div class = "dropdown">
+		<button type ="button" onclick = "myFunction()" class ="dropbtn"> Dropdown </button>
+		<div id = "myDropdown" class = "dropdown-content">
+			<a href = "home"> Temperature </a>
+			<a href = "home"> Humidity </a>
+			<a href = "home"> Particulate Matter </a>
+				</div>
+			</div>
+			
+			
+        <script src="scripts.js"></script>
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB1-4XWM8LnJMhGsl4XIvcSyrU_pacYTxc&callback=initMap" type="text/javascript"></script>
 
+
+			
 		<div id="fixedDiv" class="body">
-        	<div id="googleMap" class="map"></div>
+        	<div id="googleMap" class ="map"></div>
         </div>
         <div id="content"></div>
-        
+		
     </body>
 </html>
