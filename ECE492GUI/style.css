@@ -31,12 +31,15 @@
 }
 
 .dropbtn{
+
 	position:relative;
 	display: inline-block;
 	
 }
 
 .dropdown{
+	top:0px;
+	left: 712px;
 	position: relative;
 	display: inline-block;
 }
