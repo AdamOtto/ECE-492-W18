@@ -66,19 +66,23 @@ function initContent(data) {
 				htmlCode += rowCells[rowCell];
 				htmlCode += '</th>';
 			} else {
-				
-				if(rowCell == 1)
-					latitude = parseInt( rowCells[rowCell] );
-				if(rowCell == 2)
-					longitude = parseInt( rowCells[rowCell] );
-				htmlCode += '<td>';
-				htmlCode += rowCells[rowCell];
-				htmlCode += '</td>';
+				if(row != 0){
+					if(rowCell == 1)
+						latitude = parseInt( rowCells[rowCell] );
+					if(rowCell == 2)
+						longitude = parseInt( rowCells[rowCell] );
+					}
+					htmlCode += '<td>';
+					htmlCode += rowCells[rowCell];
+					htmlCode += '</td>';
 			}
 		}
-		var pos = new google.maps.LatLng(latitude, longitude);
-		var mark = new google.maps.Marker({position:pos});
-		mark.setMap(map);
+		if(row != 0){
+			console.log("Adding marker " + row + ": Lat: " + latitude + ", Long: " + longitude);
+			var pos = new google.maps.LatLng(latitude, longitude);
+			var mark = new google.maps.Marker({position:pos});
+			mark.setMap(map);
+		}
 		
 		if (row === 0) {
 			htmlCode += '</tr>';
