@@ -77,5 +77,6 @@ void loop() {
   dtostrf(lon, 10, 4, lo);
   
   snprintf(txtmsg, sizeof(txtmsg), "%s,%s,%s,%s,%s,%s", h,t,d25,d100,la,lo);
+  fona.sendSMS(HOME_PHONE, txtmsg);
   //Serial.println(txtmsg);
  }
