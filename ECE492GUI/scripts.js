@@ -12,6 +12,8 @@ $(document).ready(function() {
 });
 
 var csvData;
+var csvHeaders = [];
+var csvContent = [];
 var map;
 //window.onscroll = function() {stickyFunc()};
 var mapElement;
@@ -25,6 +27,7 @@ function init(){
 	sticky = mapElement.offsetTop;
 	initMap();
 	initContent(csvData);
+	test(csvData);
 	console.log("init end.");
 }
 
@@ -96,6 +99,98 @@ function initContent(data) {
 	htmlCode += '</table>';
 	document.getElementById('content').innerHTML = htmlCode;
 	console.log("initContent end.");
+}
+
+function test(data)
+{
+	//var d1 = new Date(2017, 7, 24, 14, 52, 10);
+	//var d2 = Date.parse("2018 Feb 13 2:34:55");
+	var allRows = data.split(/\r?\n|\r/);
+	for (var row = 0; row < allRows.length; row++) {
+		var rowCells = allRows[row].split(',');
+		if(row == 0)
+			csvHeader = rowCells;
+		else
+			csvContent[row - 1] = rowCells;
+	}
+	console.log(csvHeader);
+	console.log(csvContent);
+	
+	filterTable("Tempurature", "-20", "<")
+}
+
+/*
+ FilterTable
+ 
+ Arguments:  FilterTable takes in 3 strings as arguments.
+ 	filterKey: The header that we want to sort by. (This implementation will only allow simple, 1 value filtering.)
+ 	filterValue: The value that will be compared to the table content.
+ 	filterType: 
+ 			"=" : filterValue is equal to scvContent.
+ 			">=" : filterValue is greater than or equal to scvContent.
+ 			"<=" : filterValue is less than or equal to scvContent.
+ 			">" : filterValue is greater than scvContent.
+ 			"<" : filterValue is less than scvContent.
+ * */
+function filterTable(filterKey, filterValue, filterType)
+{
+	var headerIndex = -1;
+	var newTableContent = [];
+	for(var i = 0; i < csvHeader.length; i++){
+		if(filterKey === csvHeader[i])
+		{
+			headerIndex = i;
+			break;
+		}
+	}
+	if(headerIndex == -1) {
+		console.log("Error: Couldn't find specific header to filter by.");
+		return;
+	}
+	
+	for(var i = 0; i < csvContent.length; i++){
+		
+		var filter;
+		var content;
+		
+		if (filterKey === "Name"){
+			filter = filterValue;
+			content = csvContent[i][headerIndex];
+		}
+		else if(filterKey === "Date"){
+			filter = Date.parse(filterValue);
+			content = Date.parse(csvContent[i][headerIndex]);
+		}
+		else if(filterKey === "Tempurature" || filterKey === "Dust"){
+			filter = parseInt(filterValue);
+			content = parseInt(csvContent[i][headerIndex]);
+		}
+		
+		switch(filterType) {
+			case "=" :
+				if(filter == content)
+					newTableContent[newTableContent.length] = csvContent[i];
+				break;
+			case ">=" :
+				if(filter >= content)
+					newTableContent[newTableContent.length] = csvContent[i];
+				break;
+			case "<=" :
+				if(filter <= content)
+					newTableContent[newTableContent.length] = csvContent[i];
+				break;
+			case ">" :
+				if(filter > content)
+					newTableContent[newTableContent.length] = csvContent[i];
+				break;
+			case "<" :
+				if(filter < content)
+					newTableContent[newTableContent.length] = csvContent[i];
+				break;
+		}
+	}
+	
+	console.log(newTableContent);
 }
 
 function csvFunction(data)
