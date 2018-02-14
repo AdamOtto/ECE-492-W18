@@ -7,13 +7,14 @@
 #define FONA_TX 3
 #define FONA_RST 4
 
-
 // Constants
 // DHT22 specific
 #define DHTPIN 8     // Temp & Humid Sensor
 #define DHTTYPE DHT22   // DHT 22 signal pin
 #define HOME_PHONE "+1780555555" //Home node phone number
 #define PINNUMBER "" //SIM card PIN number
+#define RI_PIN 12 //Ring Indicator Pin
+
 
 #include "SoftwareSerial.h"
 SoftwareSerial fonaSS = SoftwareSerial(FONA_TX, FONA_RX);
@@ -41,14 +42,15 @@ void setup() {
   fona.enableGPS(true);
 
   stateRI = HIGH;
-  PCMSK0 |= (1<<PCINT3);
-  pinMode(12, INPUT);
+  PCMSK0 |= (1<<PCINT4);  //pin 12
+  pinMode(RI_PIN, INPUT);
 }
 
 ISR(PCINT0_vect) {
- if (stateRI != digitalRead(11)){ 
-   if ((stateRI = digitalRead(11)) == LOW){
+ if (stateRI != digitalRead(RI_PIN)){ 
+   if ((stateRI = digitalRead(RI_PIN)) == LOW){
     sleep_disable();
+    PCMSK0 |= ~(1<<PCINT4);
     }
  } 
  else{
@@ -91,14 +93,18 @@ void loop() {
   dtostrf(dust100, 10, 4, d100);
   dtostrf(lat, 10, 4, la);
   dtostrf(lon, 10, 4, lo);
-  
+
+  //Package and Send
   snprintf(txtmsg, sizeof(txtmsg), "%s,%s,%s,%s,%s,%s", h,t,d25,d100,la,lo);
   fona.sendSMS(HOME_PHONE, txtmsg);
 
+  //Time to go to sleep!
+  ADCSRA = 0;
   set_sleep_mode (SLEEP_MODE_PWR_DOWN);  
   sleep_enable();
   cli();
   sleep_bod_disable();
   sei();
+  PCMSK0 |= (1<<PCINT4);
   sleep_cpu();
  }

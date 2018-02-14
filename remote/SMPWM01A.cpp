@@ -52,7 +52,7 @@ void SMPWM01A::begin() {
   PCMSK0 |= (1<<PCINT1);  // want pin  4 ==> 9
   PCMSK0 |= (1<<PCINT2);  // want pin  5 ==> 10
   PCIFR  |= (1<<PCIF0);   	// clear any outstanding interrupts
-  PCICR  |= (1<<PCIE0);   	// enable pin change interrupts for PD4 & PD5
+  PCICR  |= (1<<PCIE0);   	// enable pin change interrupts for PD4 & PD5 ==>9&10
 
   pinMode(P1, INPUT);      
   pinMode(P2, INPUT);
