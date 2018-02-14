@@ -58,9 +58,9 @@ function initContent(header, body) {
 	document.getElementById('content').innerHTML = "";
 	
 	var contentString = createContentString(1,190,20,39);	
-var infoWindowContent = [ ['hello'],['Lol'],['test'],['marker'],['oops'],['lold'],['sup']]	
+	var infoWindowContent = createInfoWindowContent(body);	
 	var infoWindow = new google.maps.InfoWindow(),marker,row;
-	
+	console.log('The new infowindowcontent is ' + infoWindowContent);
 	
 	htmlCode += '<thead><tr>'
 	for (var h = 0; h < header.length; h++) {
@@ -250,10 +250,14 @@ function createInfoWindowContent(data){
 	var infoWindow = [];
 	console.log("inside createInfoWindowContent");
 	console.log('the lenght of hte data is ' + data.length);
-	console.log('that data at data[0]' + data[0]);
+	console.log('that data at data[0]' + data[0][0] + ' ' + data[0][1] +' '+data[0][2] + ' '+data[0][3] +' '+data[0][4]);
 	for (var i = 0; i < data.length; i ++){
-		infoWindow.push(data[i]);
-		console.log('printing the data inside for loop' + data[i][0][0] );
+		infoWindow.push([ '<h1>'+ data[i][0]+'</h1>' + 
+		'<p>Latitude: ' + data[i][1] +'</p>' +
+		'<p>Longitude: '+ data[i][2] +'</p>'+
+		'<p>Temperature: '+data[i][3] +'</p>'+ 
+		'<p>Particulate matter: '+data[i][4] +'</p>']);
+		console.log('printing the data inside for loop' + data[i] );
 	}
 	console.log('the infoWindow is now' + infoWindow);
 	return infoWindow;
