@@ -57,6 +57,11 @@ function initContent(header, body) {
 	var hlon;
 	document.getElementById('content').innerHTML = "";
 	
+	var contentString = createContentString(1,190,20,39);	
+var infoWindowContent = [ ['hello'],['Lol'],['test'],['marker'],['oops'],['lold'],['sup']]	
+	var infoWindow = new google.maps.InfoWindow(),marker,row;
+	
+	
 	htmlCode += '<thead><tr>'
 	for (var h = 0; h < header.length; h++) {
 		htmlCode += '<th>';
@@ -87,10 +92,23 @@ function initContent(header, body) {
 			htmlCode += '</td>';
 		}
 
-		console.log("Adding marker " + row + ": Lat: " + latitude + ", Long: " + longitude);
-		var pos = new google.maps.LatLng(latitude, longitude);
-		var mark = new google.maps.Marker({position:pos});
-		mark.setMap(map);
+		console.log("Adding marker " + row + ": Lat: " + latitude + ", Long: " + longitude);		
+			var pos = new google.maps.LatLng(latitude, longitude);
+			marker = new google.maps.Marker({
+			position:pos,
+			map:map,
+			title:'hello'
+			});
+			
+			console.log(row);
+			google.maps.event.addListener(marker,'click',(function(marker,row){
+				return function(){
+					console.log('setting the content to this' + row + infoWindowContent[row][0]);
+					infoWindow.setContent(infoWindowContent[row][0]);
+					infoWindow.open(map,marker);
+				}
+			})(marker,row));
+			
 		
 		htmlCode += '</tr>';
 	}
@@ -216,4 +234,47 @@ function stickyFunc(){
  	} else {
 		mapElement.classList.remove("sticky");
 	}
+}
+
+function createContentString(station_number,temp,humididty,pmatter){
+	var contentString = '<h1 class= "contentstring"> REMOTE STATION' + station_number + '</h1>'+
+						'<p>Temperature: '+ temp + ' </p>'+
+						'<p>Humididty: '+ humididty + ' </p>' +
+						'<p>Particulate matter: ' + pmatter +' </p>';
+	return contentString;
+}
+
+
+
+function createInfoWindowContent(data){
+	var infoWindow = [];
+	console.log("inside createInfoWindowContent");
+	console.log('the lenght of hte data is ' + data.length);
+	console.log('that data at data[0]' + data[0]);
+	for (var i = 0; i < data.length; i ++){
+		infoWindow.push(data[i]);
+		console.log('printing the data inside for loop' + data[i][0][0] );
+	}
+	console.log('the infoWindow is now' + infoWindow);
+	return infoWindow;
+}
+
+
+function myFunction() {
+	console.log("hello inside myFunction");
+    document.getElementById("myDropdown").classList.toggle("show");
+}
+
+window.onclick = function(event) {
+  if (!event.target.matches('.dropbtn')) {
+
+    var dropdowns = document.getElementsByClassName("dropdown-content");
+    var i;
+    for (i = 0; i < dropdowns.length; i++) {
+      var openDropdown = dropdowns[i];
+      if (openDropdown.classList.contains('show')) {
+        openDropdown.classList.remove('show');
+      }
+    }
+  }
 }
