@@ -38,15 +38,15 @@ void setup() {
 
 
 void loop() {
-  char fonaNotificationBuffer[64];          //for notifications from the FONA
+  char fonaNotificationBuffer[64];          
   char smsBuffer[250];
-  char* bufPtr = fonaNotificationBuffer;    //handy buffer pointer
+  char* bufPtr = fonaNotificationBuffer;    
   
-  if (fona.available())      //any data available from the FONA?
+  if (fona.available())      
   {
-    int slot = 0;            //this will be the slot number of the SMS
+    int slot = 0;            
     int charCount = 0;
-    //Read the notification into fonaInBuffer
+    
     do  {
       *bufPtr = fona.read();
       Serial.write(*bufPtr);

@@ -64,7 +64,6 @@ void loop() {
   dust100 = dust.getPM10();
 
   if (fona.getNetworkStatus() == 1) {
-    // network & GPRS? Great! Print out the GSM location to compare
     boolean gsmloc_success = fona.getGSMLoc(&lat, &lon);
   }
   
@@ -78,5 +77,4 @@ void loop() {
   
   snprintf(txtmsg, sizeof(txtmsg), "%s,%s,%s,%s,%s,%s", h,t,d25,d100,la,lo);
   fona.sendSMS(HOME_PHONE, txtmsg);
-  //Serial.println(txtmsg);
  }
