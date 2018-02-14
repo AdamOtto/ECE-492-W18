@@ -49,10 +49,10 @@ void SMPWM01A::begin() {
   // Enable pin change interrupt
   // Note: These values are specific to Arduino Uno, for other devices refer to:  
   // http://gammon.com.au/interrupts
-  PCMSK2 |= (1<<PCINT20);  // want pin  4 
-  PCMSK2 |= (1<<PCINT21);  // want pin  5 
-  PCIFR  |= (1<<PCIF2);   	// clear any outstanding interrupts
-  PCICR  |= (1<<PCIE2);   	// enable pin change interrupts for PD4 & PD5
+  PCMSK0 |= (1<<PCINT1);  // want pin  4 ==> 9
+  PCMSK0 |= (1<<PCINT2);  // want pin  5 ==> 10
+  PCIFR  |= (1<<PCIF0);   	// clear any outstanding interrupts
+  PCICR  |= (1<<PCIE0);   	// enable pin change interrupts for PD4 & PD5
 
   pinMode(P1, INPUT);      
   pinMode(P2, INPUT);
@@ -65,10 +65,10 @@ void SMPWM01A::begin() {
 
 
 
-ISR(PCINT2_vect) {
- SMPWM01A::PCINT2_ISR();
+//ISR(PCINT2_vect) {
+ //SMPWM01A::PCINT2_ISR();
   
-} 
+//} 
 
 
 void SMPWM01A::PCINT2_ISR() {

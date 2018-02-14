@@ -1,6 +1,7 @@
 #include "DHT.h"
 #include "SMPWM01A.h"
 #include "Adafruit_FONA.h"
+#include <avr/sleep.h>
 
 #define FONA_RX 2
 #define FONA_TX 3
@@ -22,6 +23,7 @@ Adafruit_FONA fona = Adafruit_FONA(FONA_RST);
 
 DHT dht(DHTPIN, DHTTYPE); // Instantiate dht
 SMPWM01A dust; // Instantiate dust sensor
+int stateRI;
 
 void setup() {
   Serial.begin(115200);
@@ -37,7 +39,22 @@ void setup() {
 
   fonaSerial->print("AT+CNMI=2,1\r\n");
   fona.enableGPS(true);
+
+  stateRI = HIGH;
+  PCMSK0 |= (1<<PCINT3);
+  pinMode(12, INPUT);
 }
+
+ISR(PCINT0_vect) {
+ if (stateRI != digitalRead(11)){ 
+   if ((stateRI = digitalRead(11)) == LOW){
+    sleep_disable();
+    }
+ } 
+ else{
+  dust.PCINT2_ISR();
+ }
+} 
 
 void loop() {
   //floating point variables to hold sensor values
@@ -77,4 +94,11 @@ void loop() {
   
   snprintf(txtmsg, sizeof(txtmsg), "%s,%s,%s,%s,%s,%s", h,t,d25,d100,la,lo);
   fona.sendSMS(HOME_PHONE, txtmsg);
+
+  set_sleep_mode (SLEEP_MODE_PWR_DOWN);  
+  sleep_enable();
+  cli();
+  sleep_bod_disable();
+  sei();
+  sleep_cpu();
  }
