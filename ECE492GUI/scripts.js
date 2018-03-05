@@ -81,7 +81,8 @@ function initContent(header, body) {
 		htmlCode += '<tr>';
 		var latitude = 0;
 		var longitude = 0;
-		
+		var temperature = 0;
+		var markerColor ='http://maps.google.com/mapfiles/ms/icons/green-dot.png';
 		for (var rowCell = 0; rowCell < body[row].length; rowCell++) {
 			if(rowCell == hlat)
 				latitude = parseInt( body[row][rowCell] );
@@ -93,17 +94,44 @@ function initContent(header, body) {
 		}
 
 		console.log("Adding marker " + row + ": Lat: " + latitude + ", Long: " + longitude);		
+		console.log("the temperature is " + body[row][3]);
+		temperature = parseInt(body[row][3]);
+		console.log(-10 > temperature);
+		console.log(-temperature > -20);
+		if(temperature <= -25){
+			markerColor ='http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+		}
+		if( (-10 > temperature )&&( temperature > -20)){
+			console.log("inside this other if");
+			markerColor = 'http://maps.google.com/mapfiles/ms/icons/ltblue-dot.png';
+		}
+		if(( 0 > temperature)&&(temperature > -10)){
+			console.log("im inside here ");
+			markerColor = 'http://maps.google.com/mapfiles/ms/icons/green-dot.png';
+		}
+		if((temperature > 0) && ( temperature < 10)){
+			markerColor = 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png';
+		}		
+		if((temperature >= 10) && ( temperature < 20)){
+			markerColor = 'http://maps.google.com/mapfiles/ms/icons/orange-dot.png';
+		}		
+		if(temperature >= 20){
+			markerColor = 'http://maps.google.com/mapfiles/ms/icons/red-dot.png';
+		}
+		
 			var pos = new google.maps.LatLng(latitude, longitude);
 			marker = new google.maps.Marker({
-				position:pos,
-				map:map,
-				title:'hello'
+			position:pos,
+			map:map,
+			icon: markerColor,
+			title:'hello'
 			});
 			
 			console.log(row);
 			google.maps.event.addListener(marker,'click',(function(marker,row){
 				return function(){
 					console.log('setting the content to this' + row + infoWindowContent[row][0]);
+					map.setZoom(10);
 					infoWindow.setContent(infoWindowContent[row][0]);
 					infoWindow.open(map,marker);
 				}
