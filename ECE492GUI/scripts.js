@@ -132,6 +132,7 @@ function initContent(header, body) {
 			google.maps.event.addListener(marker,'click',(function(marker,row){
 				return function(){
 					console.log('setting the content to this' + row + infoWindowContent[row][0]);
+					map.setZoom(10);
 					infoWindow.setContent(infoWindowContent[row][0]);
 					infoWindow.open(map,marker);
 				}
