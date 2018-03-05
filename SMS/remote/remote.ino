@@ -1,3 +1,12 @@
+/*
+ * Created by: Ken Hidalgo and Qikai Lu
+ * Code for the remote station using SMS
+ * This implementation has the arduino sleep until it recieves a message
+ * from the home station. It then awakens and sends information from its
+ * sensors.
+ * Uses a temp/humidity sensor, particulate matter sensor, and gps sensor
+ * Currently has not been tested. Can compile.
+*/
 #include "DHT.h"
 #include "SMPWM01A.h"
 #include "Adafruit_FONA.h"
@@ -11,7 +20,7 @@
 // DHT22 specific
 #define DHTPIN 8     // Temp & Humid Sensor
 #define DHTTYPE DHT22   // DHT 22 signal pin
-#define HOME_PHONE "+1780555555" //Home node phone number
+#define HOME_PHONE "+1780555555" //Home node phone number, currently not real
 #define PINNUMBER "" //SIM card PIN number
 #define RI_PIN 12 //Ring Indicator Pin
 

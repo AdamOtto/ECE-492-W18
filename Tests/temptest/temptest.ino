@@ -1,3 +1,9 @@
+/**
+ * Created by: Ken Hidalgo and Qikai Lu
+ * Simple functionality test for the DHT22 Temp/Humidity sensor
+ * Polls the sensor every 15 secs
+ * Prints values to serial monitor
+ */
 #include <stdio.h>
 #include "DHT.h"
 
@@ -7,13 +13,11 @@
 DHT dht(DHTPIN, DHTTYPE);
 
 void setup() {
-  // put your setup code here, to run once:
   Serial.begin(9600);
   dht.begin();
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
   float hum;  //Stores humidity value
   float temp; //Stores temperature value
   Serial.println("Start");

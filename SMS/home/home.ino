@@ -1,3 +1,11 @@
+/*
+ * Created by Ken Hidalgo and Qikai Lu
+ * Code for the home station using SMS
+ * This implementation simply waits for a message from a remote station
+ * and records it to an SD card. If there is no message to save then it will
+ * send a request message to a remote station.
+ * Currently has not been tested. Can compile.
+ */
 #include "Adafruit_FONA.h"
 #include <SPI.h>
 #include <SD.h>
@@ -102,8 +110,11 @@ void loop() {
         // print to the serial port too:
         Serial.println(smsBuffer);
       }
-
-      //TODO: Request/Ack functionality. Timeout Functionality.
     }
+  }else{
+    //To be changed later
+    char * REMOTE_PHONE = "+17805555555";
+    char * rq_msg = "REQ";
+    fona.sendSMS(REMOTE_PHONE, rq_msg);
   }
 }

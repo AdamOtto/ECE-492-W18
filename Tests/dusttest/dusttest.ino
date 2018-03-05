@@ -1,16 +1,21 @@
+/**
+ * Created by: Ken Hidalgo and Qikai Lu
+ * Simple functionality test for the SMPWM-01C dust sensor
+ * Polls the sensor every 15 secs
+ * Prints values to serial monitor
+ */
 #include <stdio.h>
 #include "SMPWM01A.h"
 
 SMPWM01A dust;
 
 void setup() {
-  // put your setup code here, to run once:
   Serial.begin(9600);
   dust.begin();
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  
   float dust25; //Store PM2.5 (fine)
   float dust100; //Store PM10 (coarse)
   Serial.println("Start");
@@ -27,5 +32,5 @@ void loop() {
   Serial.println(d25);
   Serial.print("Small Particulate Concentration: ");
   Serial.println(d100);
-  delay(30000);
+  delay(15000);
 }
