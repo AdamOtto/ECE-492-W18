@@ -95,9 +95,9 @@ function initContent(header, body) {
 		console.log("Adding marker " + row + ": Lat: " + latitude + ", Long: " + longitude);		
 			var pos = new google.maps.LatLng(latitude, longitude);
 			marker = new google.maps.Marker({
-			position:pos,
-			map:map,
-			title:'hello'
+				position:pos,
+				map:map,
+				title:'hello'
 			});
 			
 			console.log(row);
