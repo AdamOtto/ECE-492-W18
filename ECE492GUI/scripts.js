@@ -50,8 +50,6 @@ function initMap() {
  * 
  * Takes in the headers of the table and the rows, or the body, of the table as arguments.
  */
- 
-var markers = [];
 function initContent(header, body) {
 	//Code help from -> https://code.tutsplus.com/tutorials/parsing-a-csv-file-with-javascript--cms-25626
 	console.log("initContent started...");
@@ -129,16 +127,16 @@ function initContent(header, body) {
 			icon: markerColor,
 			title:'hello'
 			});
-			markers.push(marker);
+			
 			console.log(row);
 			google.maps.event.addListener(marker,'click',(function(marker,row){
 				return function(){
 					console.log('setting the content to this' + row + infoWindowContent[row][0]);
+					map.setZoom(10);
 					infoWindow.setContent(infoWindowContent[row][0]);
 					infoWindow.open(map,marker);
 				}
 			})(marker,row));
-			
 			
 		
 		htmlCode += '</tr>';
@@ -148,18 +146,6 @@ function initContent(header, body) {
 	document.getElementById('content').innerHTML = htmlCode;
 	console.log("initContent end.");
 }
-
-   function clearMap() {
-        for (var i = 0; i < markers.length; i++) {
-          markers[i].setMap(null);
-        }
-		markers.length = 0;
-      }
-	  
-function deleteMarkers(){
-	clearMap();
-}
-
 
 function parseData(data)
 {
@@ -175,8 +161,6 @@ function parseData(data)
 	}
 	console.log(csvHeader);
 	console.log(csvContent);
-	
-	filterTable("Tempurature", "-20", "<")
 }
 
 /**
@@ -291,9 +275,9 @@ function createContentString(station_number,temp,humididty,pmatter){
 
 function createInfoWindowContent(data){
 	var infoWindow = [];
-	console.log("inside createInfoWindowContent");
-	console.log('the lenght of hte data is ' + data.length);
-	console.log('that data at data[0]' + data[0][0] + ' ' + data[0][1] +' '+data[0][2] + ' '+data[0][3] +' '+data[0][4]);
+	//console.log("inside createInfoWindowContent");
+	//console.log('the lenght of hte data is ' + data.length);
+	//console.log('that data at data[0]' + data[0][0] + ' ' + data[0][1] +' '+data[0][2] + ' '+data[0][3] +' '+data[0][4]);
 	for (var i = 0; i < data.length; i ++){
 		infoWindow.push([ '<h1>'+ data[i][0]+'</h1>' + 
 		'<p>Latitude: ' + data[i][1] +'</p>' +
@@ -309,7 +293,6 @@ function createInfoWindowContent(data){
 
 function myFunction() {
 	console.log("hello inside myFunction");
-
     document.getElementById("myDropdown").classList.toggle("show");
 }
 
@@ -338,8 +321,10 @@ function callServer() {
     }
     xmlhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
-            document.getElementById("content").innerHTML = this.responseText;
-            displayToLog(this.responseText);
+            //document.getElementById("content").innerHTML = this.responseText;
+            //console.log(this.responseText);
+            parseData(this.responseText);
+            initContent(csvHeader, csvContent);
         }
     };
     xmlhttp.open("GET","http://localhost/serverCom.php",true);
