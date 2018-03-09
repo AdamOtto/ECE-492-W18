@@ -50,6 +50,8 @@ function initMap() {
  * 
  * Takes in the headers of the table and the rows, or the body, of the table as arguments.
  */
+ 
+var markers = [];
 function initContent(header, body) {
 	//Code help from -> https://code.tutsplus.com/tutorials/parsing-a-csv-file-with-javascript--cms-25626
 	console.log("initContent started...");
@@ -127,16 +129,16 @@ function initContent(header, body) {
 			icon: markerColor,
 			title:'hello'
 			});
-			
+			markers.push(marker);
 			console.log(row);
 			google.maps.event.addListener(marker,'click',(function(marker,row){
 				return function(){
 					console.log('setting the content to this' + row + infoWindowContent[row][0]);
-					map.setZoom(10);
 					infoWindow.setContent(infoWindowContent[row][0]);
 					infoWindow.open(map,marker);
 				}
 			})(marker,row));
+			
 			
 		
 		htmlCode += '</tr>';
@@ -146,6 +148,18 @@ function initContent(header, body) {
 	document.getElementById('content').innerHTML = htmlCode;
 	console.log("initContent end.");
 }
+
+   function clearMap() {
+        for (var i = 0; i < markers.length; i++) {
+          markers[i].setMap(null);
+        }
+		markers.length = 0;
+      }
+	  
+function deleteMarkers(){
+	clearMap();
+}
+
 
 function parseData(data)
 {
@@ -295,6 +309,7 @@ function createInfoWindowContent(data){
 
 function myFunction() {
 	console.log("hello inside myFunction");
+
     document.getElementById("myDropdown").classList.toggle("show");
 }
 

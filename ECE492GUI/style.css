@@ -17,8 +17,17 @@
   padding-top: 102px;
 }
 
+.temp_pic {
+	width: 150px;
+	height:350px;
+	display: block;
+	margin-left: 950px;
+	margin-right: auto;
+	position: absolute;
+	z-index:1;	
+}
 table {
-  margin: 0 auto;
+  margin-left: 100px
   text-align: center;
   border-collapse: collapse;
   border: 1px solid #d4d4d4;
@@ -58,7 +67,7 @@ th {
 
 .dropdown{
 	top:0px;
-	left: 1000px;
+	left: 1100px;
 	position: relative;
 	display: inline-block;
 }

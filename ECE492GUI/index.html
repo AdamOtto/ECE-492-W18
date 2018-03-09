@@ -10,8 +10,9 @@
     	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     	
         <h1>Base Station GUI</h1>
-		
 		<div class = "dropdown">
+		      <input onclick="deleteMarkers();" type=button value="Delete Markers">
+
 		<button onclick = "myFunction()" class ="dropbtn"> Dropdown </button>
 		<div id = "myDropdown" class = "dropdown-content">
 			<a href = "home"> Temperature </a>
@@ -19,14 +20,15 @@
 			<a href = "home"> Particulate Matter </a>
 				</div>
 			</div>
-        
         <script src="scripts.js"></script>
         <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB1-4XWM8LnJMhGsl4XIvcSyrU_pacYTxc" type="text/javascript"></script>
-
 		<div id="fixedDiv" class="body">
-        	<div id="googleMap" class="map"></div>
+			<img src ="temperature_scale.png" alt = "temp scale" class = "temp_pic">
+        	<div id="googleMap" class="map">
+				</div>
         </div>
         <div id="content"></div>
-        
+		
+
     </body>
 </html>
