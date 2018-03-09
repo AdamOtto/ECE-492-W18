@@ -147,6 +147,17 @@ function initContent(header, body) {
 	console.log("initContent end.");
 }
 
+function clearMap() {
+	for (var i = 0; i < markers.length; i++) {
+		markers[i].setMap(null);
+	}
+	markers.length = 0;
+}
+	  
+function deleteMarkers(){
+	clearMap();
+}
+
 function parseData(data)
 {
 	//var d1 = new Date(2017, 7, 24, 14, 52, 10);
