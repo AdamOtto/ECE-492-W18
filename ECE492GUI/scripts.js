@@ -50,6 +50,7 @@ function initMap() {
  * 
  * Takes in the headers of the table and the rows, or the body, of the table as arguments.
  */
+ var markers =  [];
 function initContent(header, body) {
 	//Code help from -> https://code.tutsplus.com/tutorials/parsing-a-csv-file-with-javascript--cms-25626
 	console.log("initContent started...");
@@ -127,7 +128,7 @@ function initContent(header, body) {
 			icon: markerColor,
 			title:'hello'
 			});
-			
+			markers.push(marker);
 			console.log(row);
 			google.maps.event.addListener(marker,'click',(function(marker,row){
 				return function(){
