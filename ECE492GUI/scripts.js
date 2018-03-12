@@ -18,17 +18,18 @@ var map;
 //window.onscroll = function() {stickyFunc()};
 var mapElement;
 var sticky;
-
+var time;
 
 function init(){
 	console.log("init started...");
+	time = new Date();
 	window.onscroll = function() {stickyFunc()};
 	mapElement = document.getElementById("fixedDiv");
 	sticky = mapElement.offsetTop;
 	initMap();
-	parseData(csvData);
-	//callServer();
-	initContent(csvHeader, csvContent);
+	//parseData(csvData);
+	callServer();
+	//initContent(csvHeader, csvContent);
 	console.log("init end.");
 }
 
@@ -340,4 +341,9 @@ function callServer() {
     };
     xmlhttp.open("GET","http://localhost/serverCom.php",true);
     xmlhttp.send();
+}
+
+function getPrevDate()
+{
+	console.log(time);
 }
