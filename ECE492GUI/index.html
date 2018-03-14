@@ -11,13 +11,14 @@
     	
         <h1>Base Station GUI</h1>
 		<div class = "dropdown">
-		      <input onclick="deleteMarkers();" type=button value="Delete Markers">
+		      <input onclick="deleteMarkers()" type=button value="Delete Markers">
 
 		<button onclick = "myFunction()" class ="dropbtn"> Dropdown </button>
 		<div id = "myDropdown" class = "dropdown-content">
 			<a href = "home"> Temperature </a>
 			<a href = "home"> Humidity </a>
 			<a href = "home"> Particulate Matter </a>
+			<a onclick = "deleteMarkers()"> Date </a>
 				</div>
 			</div>
         <script src="scripts.js"></script>
@@ -34,9 +35,11 @@
 					<td>
 						<button id="nextButton">Get earlier data</button>
 					</td>
-					<td></td>
 					<td>
-						<button id="prevButton" onclick="getPrevDate">Get later data</button>
+						<input type="text" id="textDate"> </input>
+					</td>
+					<td>
+						<button id="prevButton" onclick="getPrevDate()">Get later data</button>
 					</td>
 				</tr>
 			</table>

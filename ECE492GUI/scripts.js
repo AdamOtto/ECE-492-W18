@@ -51,6 +51,7 @@ function initMap() {
  * 
  * Takes in the headers of the table and the rows, or the body, of the table as arguments.
  */
+ var markers =  [];
 function initContent(header, body) {
 	//Code help from -> https://code.tutsplus.com/tutorials/parsing-a-csv-file-with-javascript--cms-25626
 	console.log("initContent started...");
@@ -128,7 +129,7 @@ function initContent(header, body) {
 			icon: markerColor,
 			title:'hello'
 			});
-			
+			markers.push(marker);
 			console.log(row);
 			google.maps.event.addListener(marker,'click',(function(marker,row){
 				return function(){
@@ -343,7 +344,29 @@ function callServer() {
     xmlhttp.send();
 }
 
+function callServerTime(filterTime){	
+	if (window.XMLHttpRequest) {
+            // code for IE7+, Firefox, Chrome, Opera, Safari
+            xmlhttp = new XMLHttpRequest({mozSystem: true});
+    } else {
+        // code for IE6, IE5
+        xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    xmlhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            parseData(this.responseText);
+            initContent(csvHeader, csvContent);
+        }
+    };
+    xmlhttp.open("GET","http://localhost/DateFilter.php",true);
+    xmlhttp.send(filterTime);
+}
+
 function getPrevDate()
 {
-	console.log(time);
+	time = new Date(time - (10 * 60000));
+	var dt = time.toISOString().slice(0, 19).replace('T', ' ');
+	document.getElementById('textDate').value = dt;
+	callServerTime(time);
+	
 }
