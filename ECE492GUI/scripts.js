@@ -81,7 +81,7 @@ function initContent(header, body) {
 	htmlCode += '</thead>';
 	htmlCode += '<tbody>';
 	
-	for (var row = 0; row < body.length; row++) {
+	for (var row = 0; row < body.length - 1; row++) {
 		htmlCode += '<tr>';
 		var latitude = 0;
 		var longitude = 0;
@@ -177,92 +177,6 @@ function parseData(data)
 	}
 	//console.log(csvHeader);
 	//console.log(csvContent);
-}
-
-/**
- FilterTable
- 
- filters the contents of the csv file based on the arguments passed in.
- 
- Arguments:  FilterTable takes in 3 strings as arguments.
- 	filterKey: The header that we want to sort by. (This implementation will only allow simple, 1 value filtering.)
- 	filterValue: The value that will be compared to the table content.
- 	filterType: 
- 			"=" : filterValue is equal to scvContent.
- 			">=" : filterValue is greater than or equal to scvContent.
- 			"<=" : filterValue is less than or equal to scvContent.
- 			">" : filterValue is greater than scvContent.
- 			"<" : filterValue is less than scvContent.
-*/
-function filterTable(filterKey, filterValue, filterType)
-{
-	var headerIndex = -1;
-	var newTableContent = [];
-	for(var i = 0; i < csvHeader.length; i++){
-		if(filterKey === csvHeader[i])
-		{
-			headerIndex = i;
-			break;
-		}
-	}
-	if(headerIndex == -1) {
-		console.log("Error: Couldn't find specific header to filter by.");
-		return;
-	}
-	
-	for(var i = 0; i < csvContent.length; i++){
-		
-		var filter;
-		var content;
-		
-		if (filterKey === "Name"){
-			filter = filterValue;
-			content = csvContent[i][headerIndex];
-		}
-		else if(filterKey === "Date"){
-			filter = Date.parse(filterValue);
-			content = Date.parse(csvContent[i][headerIndex]);
-		}
-		else if(filterKey === "Tempurature" || filterKey === "Dust"){
-			filter = parseInt(filterValue);
-			content = parseInt(csvContent[i][headerIndex]);
-		}
-		
-		switch(filterType) {
-			case "=" :
-				if(filter == content)
-					newTableContent[newTableContent.length] = csvContent[i];
-				break;
-			case ">=" :
-				if(filter >= content)
-					newTableContent[newTableContent.length] = csvContent[i];
-				break;
-			case "<=" :
-				if(filter <= content)
-					newTableContent[newTableContent.length] = csvContent[i];
-				break;
-			case ">" :
-				if(filter > content)
-					newTableContent[newTableContent.length] = csvContent[i];
-				break;
-			case "<" :
-				if(filter < content)
-					newTableContent[newTableContent.length] = csvContent[i];
-				break;
-		}
-	}
-	
-	console.log(newTableContent);
-}
-
-/**
- * 
- * 
- * Loads the latest data of the csv file.  Assumes the most recent data is appended to the end of the file.
- */
-function LoadLatestData()
-{
-	
 }
 
 function csvFunction(data)
@@ -379,7 +293,7 @@ function getNow(){
 	timestamp = Date.parse( document.getElementById('textDate').value );
 	if(isNaN(timestamp)==false)
 	{
-		parseDateString(document.getElementById('textDate').value)
+		time = parseDateString(document.getElementById('textDate').value)
 		console.log(time)
 		callServerTime(time);
 	}
@@ -401,17 +315,20 @@ function getPrevDate()
 
 function getNextDate()
 {
-	time = new Date(time + (10 * 60000));
-	document.getElementById('textDate').value = time.toISOString().slice(0, 19).replace('T', ' ');;
+	time = new Date(time.getTime() + (10 * 60000));
+	dt = time.toISOString().slice(0, 19).replace('T', ' ');
+	document.getElementById('textDate').value = dt;
 	callServerTime(time);	
 }
 
 function parseDateString(datestr){
-	
-	var year = datestr.substring(0,4);
-	console.log(year);
-	var month = datestr.substring(5,7);
-	console.log(month);
-	var day = datestr.substring(8,10)
-	console.log(day);
+	var newTime = new Date();
+	newTime.setFullYear( datestr.substring(0,4) );
+	newTime.setMonth( (datestr.substring(5,7)) - 1 );
+	newTime.setDate( datestr.substring(8,10) );
+	newTime.setUTCHours( datestr.substring(11,13) );
+	newTime.setUTCMinutes( datestr.substring(14,16) );
+	newTime.setUTCSeconds( datestr.substring(17,19) );
+	//console.log(newTime);
+	return newTime;
 }
