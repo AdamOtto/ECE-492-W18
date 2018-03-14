@@ -11,13 +11,13 @@
     	
         <h1>Base Station GUI</h1>
 		<div class = "dropdown">
-		      <input onclick="deleteMarkers()" type=button value="Delete Markers">
 
 		<button onclick = "myFunction()" class ="dropbtn"> Dropdown </button>
 		<div id = "myDropdown" class = "dropdown-content">
-			<a href = "home"> Temperature </a>
-			<a href = "home"> Humidity </a>
-			<a href = "home"> Particulate Matter </a>
+			<a onclick = "filterTemp()"> Temperature </a>
+			<a onclick = "filterHumid()"> Humidity </a>
+			<a onclick = "filterPM()"> Particulate Matter </a>
+			<a onclick = "callServer()"> Show all </a>
 			<a onclick = "deleteMarkers()"> Date </a>
 				</div>
 			</div>

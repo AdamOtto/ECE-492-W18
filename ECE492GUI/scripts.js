@@ -156,6 +156,51 @@ function clearMap() {
 	}
 	markers.length = 0;
 }
+
+function filterTemp(){
+	console.log("inside filterTemp")
+		if (window.XMLHttpRequest) {
+            // code for IE7+, Firefox, Chrome, Opera, Safari
+            xmlhttp = new XMLHttpRequest({mozSystem: true});
+    } else {
+        // code for IE6, IE5
+        xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    xmlhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            parseData(this.responseText);
+            initContent(csvHeader, csvContent);
+        }
+    };
+	console.log("opening this stuff")
+    xmlhttp.open("GET","http://localhost/serverFilterTemp.php",true);
+    xmlhttp.send();
+	
+}
+
+function filterHumid(){
+
+}
+
+function filterPM(){
+		console.log("inside filterTemp")
+		if (window.XMLHttpRequest) {
+            // code for IE7+, Firefox, Chrome, Opera, Safari
+            xmlhttp = new XMLHttpRequest({mozSystem: true});
+    } else {
+        // code for IE6, IE5
+        xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    xmlhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            parseData(this.responseText);
+            initContent(csvHeader, csvContent);
+        }
+    };
+	console.log("opening this stuff")
+    xmlhttp.open("GET","http://localhost/serverFilterPM.php",true);
+    xmlhttp.send();
+}
 	  
 function deleteMarkers(){
 	clearMap();
