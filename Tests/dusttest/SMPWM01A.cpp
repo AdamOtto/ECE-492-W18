@@ -65,10 +65,10 @@ void SMPWM01A::begin() {
 
 
 
-//ISR(PCINT2_vect) {
- //SMPWM01A::PCINT2_ISR();
+ISR(PCINT0_vect) {
+ SMPWM01A::PCINT2_ISR();
   
-//} 
+} 
 
 
 void SMPWM01A::PCINT2_ISR() {

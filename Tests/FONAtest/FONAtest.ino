@@ -98,7 +98,7 @@ void setup() {
   // network.  Contact your provider for the exact APN, username,
   // and password values.  Username and password are optional and
   // can be removed, but APN is required.
-  //fona.setGPRSNetworkSettings(F("your APN"), F("your username"), F("your password"));
+  fona.setGPRSNetworkSettings(F("Fido-core-appl1.apn"), F(""), F(""));
 
   // Optionally configure HTTP gets to follow redirects over SSL.
   // Default is not to follow SSL redirects, however if you uncomment

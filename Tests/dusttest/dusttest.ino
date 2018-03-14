@@ -28,9 +28,9 @@ void loop() {
   dtostrf(dust25, 10, 4, d25);
   dtostrf(dust100, 10, 4, d100);
 
-  Serial.print("Large Particulate Concentration: ");
-  Serial.println(d25);
   Serial.print("Small Particulate Concentration: ");
+  Serial.println(d25);
+  Serial.print("Large Particulate Concentration: ");
   Serial.println(d100);
   delay(15000);
 }

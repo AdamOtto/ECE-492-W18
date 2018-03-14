@@ -34,5 +34,5 @@ void loop() {
   Serial.println(t);
   Serial.print("Hum: ");
   Serial.println(h);
-  delay(30000);
+  delay(15000);
 }
