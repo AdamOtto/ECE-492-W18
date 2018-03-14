@@ -23,9 +23,10 @@ var time;
 function init(){
 	console.log("init started...");
 	time = new Date();
+	document.getElementById('textDate').value =  time.toISOString().slice(0, 19).replace('T', ' ');;
 	window.onscroll = function() {stickyFunc()};
 	mapElement = document.getElementById("fixedDiv");
-	sticky = mapElement.offsetTop;
+	//sticky = mapElement.offsetTop;
 	initMap();
 	//parseData(csvData);
 	callServer();
@@ -63,7 +64,7 @@ function initContent(header, body) {
 	var contentString = createContentString(1,190,20,39);	
 	var infoWindowContent = createInfoWindowContent(body);	
 	var infoWindow = new google.maps.InfoWindow(),marker,row;
-	console.log('The new infowindowcontent is ' + infoWindowContent);
+	//console.log('The new infowindowcontent is ' + infoWindowContent);
 	
 	htmlCode += '<thead><tr>'
 	for (var h = 0; h < header.length; h++) {
@@ -96,20 +97,20 @@ function initContent(header, body) {
 			htmlCode += '</td>';
 		}
 
-		console.log("Adding marker " + row + ": Lat: " + latitude + ", Long: " + longitude);		
-		console.log("the temperature is " + body[row][3]);
+		//console.log("Adding marker " + row + ": Lat: " + latitude + ", Long: " + longitude);		
+		//console.log("the temperature is " + body[row][3]);
 		temperature = parseInt(body[row][3]);
-		console.log(-10 > temperature);
-		console.log(-temperature > -20);
+		//console.log(-10 > temperature);
+		//console.log(-temperature > -20);
 		if(temperature <= -25){
 			markerColor ='http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
 		}
 		if( (-10 > temperature )&&( temperature > -20)){
-			console.log("inside this other if");
+			//console.log("inside this other if");
 			markerColor = 'http://maps.google.com/mapfiles/ms/icons/ltblue-dot.png';
 		}
 		if(( 0 > temperature)&&(temperature > -10)){
-			console.log("im inside here ");
+			//console.log("im inside here ");
 			markerColor = 'http://maps.google.com/mapfiles/ms/icons/green-dot.png';
 		}
 		if((temperature > 0) && ( temperature < 10)){
@@ -130,10 +131,10 @@ function initContent(header, body) {
 			title:'hello'
 			});
 			markers.push(marker);
-			console.log(row);
+			//console.log(row);
 			google.maps.event.addListener(marker,'click',(function(marker,row){
 				return function(){
-					console.log('setting the content to this' + row + infoWindowContent[row][0]);
+					//console.log('setting the content to this' + row + infoWindowContent[row][0]);
 					map.setZoom(10);
 					infoWindow.setContent(infoWindowContent[row][0]);
 					infoWindow.open(map,marker);
@@ -165,6 +166,8 @@ function parseData(data)
 	//var d1 = new Date(2017, 7, 24, 14, 52, 10);
 	//var d2 = Date.parse("2018 Feb 13 2:34:55");
 	var allRows = data.split(/\r?\n|\r/);
+	csvHeader = [];
+	csvContent = [];
 	for (var row = 0; row < allRows.length; row++) {
 		var rowCells = allRows[row].split(',');
 		if(row == 0)
@@ -172,8 +175,8 @@ function parseData(data)
 		else
 			csvContent[row - 1] = rowCells;
 	}
-	console.log(csvHeader);
-	console.log(csvContent);
+	//console.log(csvHeader);
+	//console.log(csvContent);
 }
 
 /**
@@ -297,9 +300,9 @@ function createInfoWindowContent(data){
 		'<p>Longitude: '+ data[i][2] +'</p>'+
 		'<p>Temperature: '+data[i][3] +'</p>'+ 
 		'<p>Particulate matter: '+data[i][4] +'</p>']);
-		console.log('printing the data inside for loop' + data[i] );
+		//console.log('printing the data inside for loop' + data[i] );
 	}
-	console.log('the infoWindow is now' + infoWindow);
+	//console.log('the infoWindow is now' + infoWindow);
 	return infoWindow;
 }
 
@@ -344,7 +347,7 @@ function callServer() {
     xmlhttp.send();
 }
 
-function callServerTime(filterTime){	
+function callServerTime(filterTime){
 	if (window.XMLHttpRequest) {
             // code for IE7+, Firefox, Chrome, Opera, Safari
             xmlhttp = new XMLHttpRequest({mozSystem: true});
@@ -355,11 +358,37 @@ function callServerTime(filterTime){
     xmlhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
             parseData(this.responseText);
+            clearMap();
             initContent(csvHeader, csvContent);
         }
     };
-    xmlhttp.open("GET","http://localhost/DateFilter.php",true);
-    xmlhttp.send(filterTime);
+    
+    var  req =	"?year=" + filterTime.getFullYear() + "&" +
+    			"month=" + (filterTime.getMonth() + 1) + "&" +
+    			"day=" + filterTime.getDate() + "&" +
+    			"hour=" + filterTime.getUTCHours() + "&" +
+    			"min=" + filterTime.getUTCMinutes() + "&" + 
+    			"sec=" + filterTime.getUTCSeconds();
+    			
+    //console.log(req)
+    xmlhttp.open("GET","http://localhost/DateFilter.php" + req,true);
+    xmlhttp.send();
+}
+
+function getNow(){
+	timestamp = Date.parse( document.getElementById('textDate').value );
+	if(isNaN(timestamp)==false)
+	{
+		parseDateString(document.getElementById('textDate').value)
+		console.log(time)
+		callServerTime(time);
+	}
+	else
+	{
+		console.log(time)
+		var dt = time.toISOString().slice(0, 19).replace('T', ' ');
+		document.getElementById('textDate').value = dt;
+	}
 }
 
 function getPrevDate()
@@ -367,6 +396,22 @@ function getPrevDate()
 	time = new Date(time - (10 * 60000));
 	var dt = time.toISOString().slice(0, 19).replace('T', ' ');
 	document.getElementById('textDate').value = dt;
-	callServerTime(time);
+	callServerTime(time);	
+}
+
+function getNextDate()
+{
+	time = new Date(time + (10 * 60000));
+	document.getElementById('textDate').value = time.toISOString().slice(0, 19).replace('T', ' ');;
+	callServerTime(time);	
+}
+
+function parseDateString(datestr){
 	
+	var year = datestr.substring(0,4);
+	console.log(year);
+	var month = datestr.substring(5,7);
+	console.log(month);
+	var day = datestr.substring(8,10)
+	console.log(day);
 }
