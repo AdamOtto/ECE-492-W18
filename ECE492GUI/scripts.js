@@ -19,6 +19,7 @@ var map;
 var mapElement;
 var sticky;
 var time;
+var FilterType = "ShowAll"
 
 function init(){
 	console.log("init started...");
@@ -170,7 +171,7 @@ function filterTemp(){
 function callServerTemp(filterTime){
 	
 	console.log("inside callserverTemp")
-	console.log(filterTime)
+	console.log(filterTime) 
 	if (window.XMLHttpRequest) {
             // code for IE7+, Firefox, Chrome, Opera, Safari
             xmlhttp = new XMLHttpRequest({mozSystem: true});
@@ -184,13 +185,14 @@ function callServerTemp(filterTime){
             initContent(csvHeader, csvContent);
         }
     };
+
 	  var  req ="?year=" + filterTime.getFullYear() + "&" +
     			"month=" + (filterTime.getMonth() + 1) + "&" +
     			"day=" + filterTime.getDate() + "&" +
     			"hour=" + filterTime.getUTCHours() + "&" +
-    			"min=" + filterTime.getUTCMinutes() + "&" + 
-    			"sec=" + filterTime.getUTCSeconds();
-	
+    			"min=" + filterTime.getUTCMinutes() + "&" + 	
+        		"sec=" + filterTime.getUTCSeconds();
+    FilterType = "Temp"
 	console.log(req)
     xmlhttp.open("GET","http://localhost/serverFilterTemp.php" + req, true);
     xmlhttp.send();
@@ -199,11 +201,32 @@ function callServerTemp(filterTime){
 	}
 
 function filterHumid(){
+	
 
 }
 
+
+
+
 function filterPM(){
-		console.log("inside filterTemp")
+	console.log("inside filterPM")
+	time = new Date(time.getTime() + (10 * 60000));
+	dt = time.toISOString().slice(0, 19).replace('T', ' ');
+	document.getElementById('textDate').value = dt;
+	callServerPM(time);
+}
+
+function filterShowAll() {
+    console.log("inside filterShowAll")
+    time = new Date(time.getTime() + (10 * 60000));
+    dt = time.toISOString().slice(0, 19).replace('T', ' ');
+    document.getElementById('textDate').value = dt;
+    FilterType = "ShowAll"
+    callServerTime(time,FilterType);
+}
+	  
+function callServerPM(filterTime){
+	console.log("inside callServerPM")
 		if (window.XMLHttpRequest) {
             // code for IE7+, Firefox, Chrome, Opera, Safari
             xmlhttp = new XMLHttpRequest({mozSystem: true});
@@ -217,10 +240,16 @@ function filterPM(){
             initContent(csvHeader, csvContent);
         }
     };
-	console.log("opening this stuff")
-    xmlhttp.open("GET","http://localhost/serverFilterPM.php",true);
+	var  req ="?year=" + filterTime.getFullYear() + "&" +
+				"month=" + (filterTime.getMonth() + 1) + "&" +
+    			"day=" + filterTime.getDate() + "&" +
+    			"hour=" + filterTime.getUTCHours() + "&" +
+    			"min=" + filterTime.getUTCMinutes() + "&" + 
+    			"sec=" + filterTime.getUTCSeconds();
+    FilterType = "PM"		
+    xmlhttp.open("GET","http://localhost/serverFilterPM.php"+ req,true);
     xmlhttp.send();
-}
+}	
 	  
 function deleteMarkers(){
 	clearMap();
@@ -326,7 +355,7 @@ function callServer() {
     xmlhttp.send();
 }
 
-function callServerTime(filterTime){
+function callServerTime(filterTime,FilterType){
 	if (window.XMLHttpRequest) {
             // code for IE7+, Firefox, Chrome, Opera, Safari
             xmlhttp = new XMLHttpRequest({mozSystem: true});
@@ -341,14 +370,15 @@ function callServerTime(filterTime){
             initContent(csvHeader, csvContent);
         }
     };
-    
-    var  req =	"?year=" + filterTime.getFullYear() + "&" +
-    			"month=" + (filterTime.getMonth() + 1) + "&" +
-    			"day=" + filterTime.getDate() + "&" +
-    			"hour=" + filterTime.getUTCHours() + "&" +
-    			"min=" + filterTime.getUTCMinutes() + "&" + 
-    			"sec=" + filterTime.getUTCSeconds();
-    			
+    console.log("FILTER TYPE IS : " + FilterType)
+    var req = "?year=" + filterTime.getFullYear() + "&" +
+        "month=" + (filterTime.getMonth() + 1) + "&" +
+        "day=" + filterTime.getDate() + "&" +
+        "hour=" + filterTime.getUTCHours() + "&" +
+        "min=" + filterTime.getUTCMinutes() + "&" +
+        "sec=" + filterTime.getUTCSeconds() + "&" +
+        "filtertype=" + FilterType;
+    console.log("inside callServerTime")
     //console.log(req)
     xmlhttp.open("GET","http://localhost/DateFilter.php" + req,true);
     xmlhttp.send();
@@ -360,7 +390,7 @@ function getNow(){
 	{
 		time = parseDateString(document.getElementById('textDate').value)
 		console.log(time)
-		callServerTime(time);
+        callServerTime(time, FilterType);
 	}
 	else
 	{
@@ -375,15 +405,15 @@ function getPrevDate()
 	time = new Date(time - (10 * 60000));
 	var dt = time.toISOString().slice(0, 19).replace('T', ' ');
 	document.getElementById('textDate').value = dt;
-	callServerTime(time);	
+	callServerTime(time,FilterType);	
 }
 
 function getNextDate()
 {
 	time = new Date(time.getTime() + (10 * 60000));
 	dt = time.toISOString().slice(0, 19).replace('T', ' ');
-	document.getElementById('textDate').value = dt;
-	callServerTime(time);	
+    document.getElementById('textDate').value = dt;
+    callServerTime(time, FilterType);	
 }
 
 function parseDateString(datestr){

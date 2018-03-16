@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
@@ -17,8 +17,7 @@
 			<a onclick = "filterTemp()"> Temperature </a>
 			<a onclick = "filterHumid()"> Humidity </a>
 			<a onclick = "filterPM()"> Particulate Matter </a>
-			<a onclick = "callServer()"> Show all </a>
-			<a onclick = "deleteMarkers()"> Date </a>
+			<a onclick = "filterShowAll()"> Show all </a>
 				</div>
 			</div>
         <script src="scripts.js"></script>
@@ -28,6 +27,14 @@
         	<div id="googleMap" class="map">
 				</div>
         </div>
+        
+        <div>
+        	<table>
+        		<tr><td></td></tr>
+        		<tr><td></td></tr>
+        	</table>
+        </div>
+        
         <div id="content"></div>
 		<div>
 			<table>

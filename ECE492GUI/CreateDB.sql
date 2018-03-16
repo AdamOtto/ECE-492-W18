@@ -27,7 +27,8 @@ CREATE TABLE IF NOT EXISTS `ECE492Database`.`RemoteStation`(
   `Temperature` DOUBLE NULL,
   `Dust 10` DOUBLE NULL,
   `Dust 2.5` DOUBLE NULL,
-  `Battery Percent` DOUBLE NULL,
+  `Humidity` DOUBLE NULL,
+  `Battery %` DOUBLE NULL,
   `Date` DATETIME NOT NULL,
   PRIMARY KEY (`StationName`, `Date`)
 )
@@ -48,13 +49,13 @@ INSERT INTO `RemoteStation`(`RemoteStationID`, `RemoteStationName`) VALUES (5, "
 
 
 */
-INSERT INTO `RemoteStation`(`StationName`, `Latitude`, `Longitude`, `Temperature`, `Dust`, `Date`) VALUES ("Station1",56,-114,-20,50,50,"2018-02-13 14:34:55");
-INSERT INTO `RemoteStation`(`StationName`, `Latitude`, `Longitude`, `Temperature`, `Dust`, `Date`) VALUES ("Station1",56,-114,-18,50,45,"2018-02-13 15:16:21");
-INSERT INTO `RemoteStation`(`StationName`, `Latitude`, `Longitude`, `Temperature`, `Dust`, `Date`) VALUES ("Station1",56,-114,-18,50,45,"2018-01-24 13:26:41");
-INSERT INTO `RemoteStation`(`StationName`, `Latitude`, `Longitude`, `Temperature`, `Dust`, `Date`) VALUES ("Station2",51,-112,-25,50,23,"2018-01-11 13:46:23");
-INSERT INTO `RemoteStation`(`StationName`, `Latitude`, `Longitude`, `Temperature`, `Dust`, `Date`) VALUES ("Station2",51,-112,-19,50,23,"2018-01-26 5:00:00");
-INSERT INTO `RemoteStation`(`StationName`, `Latitude`, `Longitude`, `Temperature`, `Dust`, `Date`) VALUES ("Station2",51,-112,-10,50,23,"2018-02-9 15:23:23");
-INSERT INTO `RemoteStation`(`StationName`, `Latitude`, `Longitude`, `Temperature`, `Dust`, `Date`) VALUES ("Station3",34,-113,12,50,63,"2018-01-27 19:00:00");
-INSERT INTO `RemoteStation`(`StationName`, `Latitude`, `Longitude`, `Temperature`, `Dust`, `Date`) VALUES ("Station3",34,-113,20,50,100,"2018-02-11 8:04:56");
-INSERT INTO `RemoteStation`(`StationName`, `Latitude`, `Longitude`, `Temperature`, `Dust`, `Date`) VALUES ("Station4",40,-120,15,50,100,"2018-02-11 8:04:56");
-INSERT INTO `RemoteStation`(`StationName`, `Latitude`, `Longitude`, `Temperature`, `Dust`, `Date`) VALUES ("Station5",60,-130,5,50,100,"2018-02-11 8:04:56");
+INSERT INTO `RemoteStation`(`StationName`, `Latitude`, `Longitude`, `Temperature`, `Dust 10`, `Dust 2.5`, `Humidity`, `Battery %`, `Date`) VALUES ("Station1",56,-114,-20,50,50,26.5,89,"2018-02-13 14:34:55");
+INSERT INTO `RemoteStation`(`StationName`, `Latitude`, `Longitude`, `Temperature`, `Dust 10`, `Dust 2.5`, `Humidity`, `Battery %`, `Date`) VALUES ("Station1",56,-114,-18,50,45,6.58,65,"2018-02-13 15:16:21");
+INSERT INTO `RemoteStation`(`StationName`, `Latitude`, `Longitude`, `Temperature`, `Dust 10`, `Dust 2.5`, `Humidity`, `Battery %`, `Date`) VALUES ("Station1",56,-114,-18,50,45,9.96,61,"2018-01-24 13:26:41");
+INSERT INTO `RemoteStation`(`StationName`, `Latitude`, `Longitude`, `Temperature`, `Dust 10`, `Dust 2.5`, `Humidity`, `Battery %`, `Date`) VALUES ("Station2",51,-112,-25,50,23,54.23,89,"2018-01-11 13:46:23");
+INSERT INTO `RemoteStation`(`StationName`, `Latitude`, `Longitude`, `Temperature`, `Dust 10`, `Dust 2.5`, `Humidity`, `Battery %`, `Date`) VALUES ("Station2",51,-112,-19,50,23,64.03,60,"2018-01-26 5:00:00");
+INSERT INTO `RemoteStation`(`StationName`, `Latitude`, `Longitude`, `Temperature`, `Dust 10`, `Dust 2.5`, `Humidity`, `Battery %`, `Date`) VALUES ("Station2",51,-112,-10,50,23,44.43,52,"2018-02-9 15:23:23");
+INSERT INTO `RemoteStation`(`StationName`, `Latitude`, `Longitude`, `Temperature`, `Dust 10`, `Dust 2.5`, `Humidity`, `Battery %`, `Date`) VALUES ("Station3",34,-113,12,50,63,23.22,75,"2018-01-27 19:00:00");
+INSERT INTO `RemoteStation`(`StationName`, `Latitude`, `Longitude`, `Temperature`, `Dust 10`, `Dust 2.5`, `Humidity`, `Battery %`, `Date`) VALUES ("Station3",34,-113,20,50,100,55.23,25,"2018-02-11 8:04:56");
+INSERT INTO `RemoteStation`(`StationName`, `Latitude`, `Longitude`, `Temperature`, `Dust 10`, `Dust 2.5`, `Humidity`, `Battery %`, `Date`) VALUES ("Station4",40,-120,15,50,100,100,100,"2018-02-11 8:04:56");
+INSERT INTO `RemoteStation`(`StationName`, `Latitude`, `Longitude`, `Temperature`, `Dust 10`, `Dust 2.5`, `Humidity`, `Battery %`, `Date`) VALUES ("Station5",60,-130,5,50,100,100,100,"2018-02-11 8:04:56");

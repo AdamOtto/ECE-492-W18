@@ -19,11 +19,19 @@ WHERE r.Date = (SELECT MAX(Date) from remotestation as r2 where r2.StationName =
 ORDER by r.StationName ASC;";
 	$result = mysqli_query($conn, $sql);
 	$resultCheck = mysqli_num_rows($result);
-	echo "StationName,Latitude,Longitude,Temperature,Dust,Date\n";
+	echo "StationName,Latitude,Longitude,Temperature,Dust10,Dust2.5,Humidity,Voltage%,Date\n";
 	if ($resultCheck > 0) {
 	    // output data of each row
 	    while($row = mysqli_fetch_assoc($result)) {
-	        echo $row['StationName'] . "," . $row["Latitude"] . "," . $row["Longitude"] . "," . $row["Temperature"] . "," . $row["Dust"] . "," . $row["Date"] . "\n";
+	        echo $row['StationName'] . "," .
+	        $row["Latitude"] . "," .
+	        $row["Longitude"] . "," .
+	        $row["Temperature"] . "," .
+	        $row["Dust 10"] . ","  .
+	        $row["Dust 2.5"] . ","  .
+	        $row["Humidity"] . ","  .
+	        $row["Battery %"] . ","  .
+	        $row["Date"] . "\n";
 	    }
 	} else {
 	    echo "Didn't get shit yo";
