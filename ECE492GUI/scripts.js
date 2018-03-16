@@ -159,7 +159,19 @@ function clearMap() {
 
 function filterTemp(){
 	console.log("inside filterTemp")
-		if (window.XMLHttpRequest) {
+	time = new Date(time.getTime() + (10 * 60000));
+	dt = time.toISOString().slice(0, 19).replace('T', ' ');
+	document.getElementById('textDate').value = dt;
+	callServerTemp(time);
+	
+}
+
+
+function callServerTemp(filterTime){
+	
+	console.log("inside callserverTemp")
+	console.log(filterTime)
+	if (window.XMLHttpRequest) {
             // code for IE7+, Firefox, Chrome, Opera, Safari
             xmlhttp = new XMLHttpRequest({mozSystem: true});
     } else {
@@ -172,11 +184,19 @@ function filterTemp(){
             initContent(csvHeader, csvContent);
         }
     };
-	console.log("opening this stuff")
-    xmlhttp.open("GET","http://localhost/serverFilterTemp.php",true);
+	  var  req ="?year=" + filterTime.getFullYear() + "&" +
+    			"month=" + (filterTime.getMonth() + 1) + "&" +
+    			"day=" + filterTime.getDate() + "&" +
+    			"hour=" + filterTime.getUTCHours() + "&" +
+    			"min=" + filterTime.getUTCMinutes() + "&" + 
+    			"sec=" + filterTime.getUTCSeconds();
+	
+	console.log(req)
+    xmlhttp.open("GET","http://localhost/serverFilterTemp.php" + req, true);
     xmlhttp.send();
 	
-}
+
+	}
 
 function filterHumid(){
 
