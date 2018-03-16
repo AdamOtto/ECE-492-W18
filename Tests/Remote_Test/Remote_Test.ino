@@ -114,8 +114,9 @@ void loop() {
   char smsBuffer[250];
   char notifBuffer[64];
   bool AckRec = false;
-  smsBuffer[0]='0'; 
+  //smsBuffer[0]='0'; 
   if (fona.available()){
+    smsBuffer[0]='0';
     extractSMS(smsBuffer, notifBuffer);
     //Send back a response
       if(smsBuffer[0]=='R'){
