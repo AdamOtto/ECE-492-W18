@@ -12,7 +12,7 @@
 	if (!$conn) {
 	    die("Connection failed: " . mysqli_error($conn));
 	}
-	mysqli_select_db($conn, "remotesensor");
+	//mysqli_select_db($conn, "remotesensor");
 	$sql = "SELECT DISTINCT *
 FROM remotestation as r
 WHERE r.Date = (SELECT MAX(Date) from remotestation as r2 where r2.StationName = r.StationName AND r2.Date < NOW())

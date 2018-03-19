@@ -20,17 +20,17 @@
 	    die("Connection failed: " . mysqli_error($conn));
 	}
 	mysqli_select_db($conn, "remotesensor");
-	$sql ="SELECT `StationName`,`Latitude`,`Longitude`,`Dust 10`,`Dust 2.5`, Date
+	$sql ="SELECT StationName,Latitude,Longitude,Humidity,Date
 	FROM remotestation as r
 	WHERE r.Date = (SELECT MAX(Date) from remotestation as r2 where r2.StationName = r.StationName AND r2.Date < "  .$q.  ")
 	ORDER by r.StationName ASC;";
 	
 	$result = mysqli_query($conn, $sql);
 	$resultCheck = mysqli_num_rows($result);
-	echo "StationName,Latitude,Longitude,Dust10,Dust2.5,Date\n";
+	echo "StationName,Latitude,Longitude,Humidity,Date\n";
 	if ($resultCheck > 0) {
 	    while($row = mysqli_fetch_assoc($result)) {
-	        echo $row['StationName'] ."," . $row["Latitude"] . "," . $row["Longitude"] ."," . $row["Dust 10"] . "," . $row["Dust 2.5"] . "," . $row["Date"] . "\n";
+	        echo $row['StationName'] ."," . $row["Latitude"] . "," . $row["Longitude"] ."," . $row["Humidity"] . "," . $row["Date"] . "\n";
 	   }
 	}
 		else{
