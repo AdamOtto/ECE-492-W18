@@ -136,7 +136,6 @@ function initContent(header, body) {
 			google.maps.event.addListener(marker,'click',(function(marker,row){
 				return function(){
 					//console.log('setting the content to this' + row + infoWindowContent[row][0]);
-					map.setZoom(10);
 					infoWindow.setContent(infoWindowContent[row][0]);
 					infoWindow.open(map,marker);
 				}
@@ -198,13 +197,77 @@ function callServerTemp(filterTime){
     xmlhttp.send();
 	
 
-	}
-
-function filterHumid(){
-	
-
 }
 
+function filterVolt() {
+    console.log("inside filterVolt")
+    time = new Date(time.getTime() + (10 * 60000));
+    dt = time.toISOString().slice(0, 19).replace('T', ' ');
+    document.getElementById('textDate').value = dt;
+    callServerVolt(time)
+}
+
+function callServerVolt(filterTime) {
+    console.log("inside callServerVolt")
+    if (window.XMLHttpRequest) {
+        // code for IE7+, Firefox, Chrome, Opera, Safari
+        xmlhttp = new XMLHttpRequest({ mozSystem: true });
+    } else {
+        // code for IE6, IE5
+        xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    xmlhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+            parseData(this.responseText);
+            initContent(csvHeader, csvContent);
+        }
+    };
+    var req = "?year=" + filterTime.getFullYear() + "&" +
+        "month=" + (filterTime.getMonth() + 1) + "&" +
+        "day=" + filterTime.getDate() + "&" +
+        "hour=" + filterTime.getUTCHours() + "&" +
+        "min=" + filterTime.getUTCMinutes() + "&" +
+        "sec=" + filterTime.getUTCSeconds();
+    FilterType = "VOLT"
+    console.log(req)
+    xmlhttp.open("GET", "http://localhost/serverFilterVolt.php" + req, true);
+    xmlhttp.send();
+}
+
+function filterHumid() {
+    console.log("inside filterPM")
+    time = new Date(time.getTime() + (10 * 60000));
+    dt = time.toISOString().slice(0, 19).replace('T', ' ');
+    document.getElementById('textDate').value = dt;
+    callServerHumid(time)
+}
+
+function callServerHumid(filterTime) {
+    console.log("inside callServerPM")
+    if (window.XMLHttpRequest) {
+        // code for IE7+, Firefox, Chrome, Opera, Safari
+        xmlhttp = new XMLHttpRequest({ mozSystem: true });
+    } else {
+        // code for IE6, IE5
+        xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    xmlhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+            parseData(this.responseText);
+            initContent(csvHeader, csvContent);
+        }
+    };
+    var req = "?year=" + filterTime.getFullYear() + "&" +
+        "month=" + (filterTime.getMonth() + 1) + "&" +
+        "day=" + filterTime.getDate() + "&" +
+        "hour=" + filterTime.getUTCHours() + "&" +
+        "min=" + filterTime.getUTCMinutes() + "&" +
+        "sec=" + filterTime.getUTCSeconds();
+    FilterType = "HUMID"
+    console.log(req)
+    xmlhttp.open("GET", "http://localhost/serverHumid.php" + req, true);
+    xmlhttp.send();
+}
 
 
 
