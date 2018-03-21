@@ -19,7 +19,9 @@ var map;
 var mapElement;
 var sticky;
 var time;
-var FilterType = "ShowAll"
+var FilterType = "ShowAll";
+var timerInterval = 60;
+var timerVal = timerInterval;
 
 function init(){
 	console.log("init started...");
@@ -489,4 +491,15 @@ function parseDateString(datestr){
 	newTime.setUTCSeconds( datestr.substring(17,19) );
 	//console.log(newTime);
 	return newTime;
+}
+
+function timer(){
+	timerVal -= 1;
+	
+	if(timer <= 0){
+		timerVal = timerInterval;
+		callServer();
+	}
+	
+	document.getElementById('timer').innerHTML = timer;
 }
