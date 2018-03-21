@@ -20,8 +20,9 @@ var mapElement;
 var sticky;
 var time;
 var FilterType = "ShowAll";
-var timerInterval = 60;
+const timerInterval = 60;
 var timerVal = timerInterval;
+var timerEnabled = true;
 
 function init(){
 	console.log("init started...");
@@ -34,6 +35,7 @@ function init(){
 	//parseData(csvData);
 	callServer();
 	//initContent(csvHeader, csvContent);
+	setInterval(timer, 1000);
 	console.log("init end.");
 }
 
@@ -575,12 +577,27 @@ function parseDateString(datestr){
 }
 
 function timer(){
-	timerVal -= 1;
+	if(timerEnabled){
+		timerVal -= 1;
+		
+		if(timerVal <= 0){
+			timerVal = timerInterval;
+			callServer();
+		}
 	
-	if(timer <= 0){
-		timerVal = timerInterval;
-		callServer();
+		document.getElementById('timer').innerHTML = timerVal;
 	}
-	
-	document.getElementById('timer').innerHTML = timer;
+}
+
+function pauseTimer()
+{
+	if(timerEnabled){
+		timerEnabled = false;
+		document.getElementById('timerPause').innerHTML = "Start";
+	}
+	else
+	{
+		timerEnabled = true;
+		document.getElementById('timerPause').innerHTML = "Pause";
+	}
 }
