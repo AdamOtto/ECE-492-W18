@@ -46,45 +46,45 @@
 
 	mysqli_select_db($conn, "id5126683_ece492database");
 	$sql =  $type . "
-	FROM RemoteStation as r
-	WHERE r.Date = (SELECT MAX(Date) from RemoteStation as r2 where r2.StationName = r.StationName AND r2.Date < " . $q . ")
+	FROM remotestation as r
+	WHERE r.Date = (SELECT MAX(Date) from remotestation as r2 where r2.StationName = r.StationName AND r2.Date < " . $q . ")
 	ORDER by r.StationName ASC;";
 	//echo ($sql);
 	$result = mysqli_query($conn, $sql);
 	$resultCheck = mysqli_num_rows($result);
 	if($filter =="Temp"){
-		echo "StationName,Latitude,Longitude,Temperature,Date\n";
+		echo "StationName,Latitude,Longitude,Temperature,Date";
 	}
 	if($filter == "PM"){
-		echo "StationName,Latitude,Longitude,Dust10,Dust2.5,Date\n";
+		echo "StationName,Latitude,Longitude,Dust10,Dust2.5,Date";
 	}
 	if($filter == "HUMID"){
-		echo "StationName,Latitude,Longitude,Humidity,Date\n";
+		echo "StationName,Latitude,Longitude,Humidity,Date";
 	}
 	if($filter == "VOLT"){
-		echo "StationName,Latitude,Longitude,Voltage%,Date\n";
+		echo "StationName,Latitude,Longitude,Voltage%,Date";
 	}
 	if($filter =="ShowAll"){
-		echo "StationName,Latitude,Longitude,Temperature,Dust10,Dust2.5,Humidity,Voltage%,Date\n";
+		echo "StationName,Latitude,Longitude,Temperature,Dust10,Dust2.5,Humidity,Voltage%,Date";
 	}	
 
 	if ($resultCheck > 0) {
 	    // output data of each row
 	    while($row = mysqli_fetch_assoc($result)) {
 			if($filter == "Temp"){
-				echo $row['StationName'] . "," . $row["Latitude"] . "," . $row["Longitude"] . "," . $row["Temperature"] . "," . $row["Date"] . "\n";
+				echo "\n" . $row['StationName'] . "," . $row["Latitude"] . "," . $row["Longitude"] . "," . $row["Temperature"] . "," . $row["Date"];
 			}
 			if($filter == "PM"){
-				echo $row['StationName'] . "," . $row["Latitude"] . "," . $row["Longitude"] . "," . $row["Dust 10"] . "," . $row["Dust 2.5"] . "," . $row["Date"] . "\n";
+				echo "\n" . $row['StationName'] . "," . $row["Latitude"] . "," . $row["Longitude"] . "," . $row["Dust 10"] . "," . $row["Dust 2.5"] . "," . $row["Date"];
 			}
 			if($filter == "HUMID"){
-				echo $row['StationName'] . "," . $row["Latitude"] . "," . $row["Longitude"] . "," . $row["Humidity"] . "," . $row["Date"] . "\n";
+				echo "\n" . $row['StationName'] . "," . $row["Latitude"] . "," . $row["Longitude"] . "," . $row["Humidity"] . "," . $row["Date"];
 			}			
 			if($filter == "VOLT"){
-				echo $row['StationName'] . "," . $row["Latitude"] . "," . $row["Longitude"] . "," . $row["Battery %"] . "," . $row["Date"] . "\n";
+				echo "\n" . $row['StationName'] . "," . $row["Latitude"] . "," . $row["Longitude"] . "," . $row["Battery %"] . "," . $row["Date"];
 			}
 			if($filter == "ShowAll"){
-				echo $row['StationName'] . "," .
+				echo "\n" . $row['StationName'] . "," .
 		        $row["Latitude"] . "," .
 		        $row["Longitude"] . "," .
 		        $row["Temperature"] . "," .
@@ -92,7 +92,7 @@
 		        $row["Dust 2.5"] . ","  .
 		        $row["Humidity"] . ","  .
 		        $row["Battery %"] . ","  .
-		        $row["Date"] . "\n";
+		        $row["Date"];
 			}
 	    }
 	} else {
@@ -100,4 +100,3 @@
 	}
 	mysqli_close($conn);
 ?>
-
