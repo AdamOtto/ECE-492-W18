@@ -269,6 +269,10 @@ function callServerHumid(filterTime) {
     xmlhttp.send();
 }
 
+function checkLastCall() {
+
+
+}
 
 
 function filterPM(){
@@ -342,6 +346,8 @@ function csvFunction(data)
 	csvData = data;
 }
 
+
+
 function stickyFunc(){
 	if (window.pageYOffset >= sticky) {
 		mapElement.classList.add("sticky");
@@ -354,7 +360,8 @@ function createContentString(station_number,temp,humididty,pmatter){
 	var contentString = '<h1 class= "contentstring"> REMOTE STATION' + station_number + '</h1>'+
 						'<p>Temperature: '+ temp + ' </p>'+
 						'<p>Humididty: '+ humididty + ' </p>' +
-						'<p>Particulate matter: ' + pmatter +' </p>';
+                        '<p>Particulate matter: ' + pmatter + ' </p>';
+        
 	return contentString;
 }
 
