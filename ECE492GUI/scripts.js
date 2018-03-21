@@ -82,19 +82,30 @@ function initContent(header, body) {
 	}
 	htmlCode += '</tr>';
 	htmlCode += '</thead>';
-	htmlCode += '<tbody>';
-	
+    htmlCode += '<tbody>';
+
+    var dateCol = findDateCol(csvHeader, csvContent);
+    var BadStations = checklastcall(csvContent, dateCol);
+    console.log(BadStations);
+
 	for (var row = 0; row < body.length - 1; row++) {
-		htmlCode += '<tr>';
+		//htmlCode += '<tr>';
 		var latitude = 0;
 		var longitude = 0;
 		var temperature = 0;
-		var markerColor ='http://maps.google.com/mapfiles/ms/icons/green-dot.png';
-		for (var rowCell = 0; rowCell < body[row].length; rowCell++) {
+        var markerColor = 'http://maps.google.com/mapfiles/ms/icons/green-dot.png';
+        if (BadStations.includes(body[row]) == true) {
+            htmlCode += '<tr id ="highlight">';
+        }
+        else {
+            htmlCode += '<tr>';
+        }
+        for (var rowCell = 0; rowCell < body[row].length; rowCell++) {
 			if(rowCell == hlat)
 				latitude = parseInt( body[row][rowCell] );
 			if(rowCell == hlon)
-				longitude = parseInt( body[row][rowCell] );
+                longitude = parseInt(body[row][rowCell]);
+
 			htmlCode += '<td>';
 			htmlCode += body[row][rowCell];
 			htmlCode += '</td>';
@@ -196,6 +207,7 @@ function callServerTemp(filterTime){
     FilterType = "Temp"
 	console.log(req)
     xmlhttp.open("GET","http://localhost/serverFilterTemp.php" + req, true);
+    findDateCol(csvHeader, csvContent);
     xmlhttp.send();
 	
 
@@ -237,7 +249,7 @@ function callServerVolt(filterTime) {
 }
 
 function filterHumid() {
-    console.log("inside filterPM")
+    console.log("inside filterHumid")
     time = new Date(time.getTime() + (10 * 60000));
     dt = time.toISOString().slice(0, 19).replace('T', ' ');
     document.getElementById('textDate').value = dt;
@@ -245,7 +257,7 @@ function filterHumid() {
 }
 
 function callServerHumid(filterTime) {
-    console.log("inside callServerPM")
+    console.log("inside callServerHumid")
     if (window.XMLHttpRequest) {
         // code for IE7+, Firefox, Chrome, Opera, Safari
         xmlhttp = new XMLHttpRequest({ mozSystem: true });
@@ -268,10 +280,76 @@ function callServerHumid(filterTime) {
     FilterType = "HUMID"
     console.log(req)
     xmlhttp.open("GET", "http://localhost/serverHumid.php" + req, true);
+    var dateCol = findDateCol(csvHeader, csvContent);
+    var BadStations = checklastcall(csvContent, dateCol);
+    console.log(BadStations);
     xmlhttp.send();
 }
 
 
+function findDateCol(csvHeader, csvContent) {
+    console.log("the csvheader is: " + csvHeader);
+    console.log("the csvContent is: " + csvContent);
+    for (var i = 0; i < csvHeader.length; i++) {
+        console.log(csvHeader[i]);
+        if (csvHeader[i] == "Date") {
+            console.log("Found Date the counter is: " + i);
+        }
+    }
+    return i
+}
+
+function checklastcall(csvContent, dateCol) {
+    time = new Date(time.getTime());
+    var ErrorStations = []
+    for (var i = 0; i < csvContent.length-1; i++) {
+        splitDateFormat = csvContent[i][8].split(" ");
+        splitYearMonthDate = splitDateFormat[0].split("-");
+        splitHourMinSec = splitDateFormat[1].split(":");
+        if ((time.getFullYear() - splitYearMonthDate[0]) == 0) {
+            if (((time.getMonth() + 1) - splitYearMonthDate[1]) == 0) {
+
+                if ((time.getDate() - splitYearMonthDate[2]) == 0) {
+                    if ((time.getHours() - splitHourMinSec[0]) == 0) {
+                        console.log("the miniutes are going to be: " + splitHourMinSec[1]);
+                        console.log(time.getUTCMinutes());
+                        console.log(time.getMinutes() - splitHourMinSec[1]);
+                        if ((time.getMinutes() - splitHourMinSec[1]) <= 10) {
+                            console.log("inside here and the statointhat passed is: " + csvContent[i]);
+                        }
+                        else {
+                            console.log("Error at station miniutes:" + csvContent[i][0]);
+                            console.log(splitHourMinSec[1]);
+                            console.log(time.getUTCMinutes());
+                            ErrorStations.push(csvContent[i]);
+                        }
+                    }
+                    else {
+                        console.log("Error at station Hours :" + csvContent[i][0]);
+                        console.log(splitHourMinSec[0]);
+                        console.log(time.getHours());
+                        ErrorStations.push(csvContent[i]);
+                    }
+                }
+                else {
+                    console.log("Error at station :" + csvContent[i][0]);
+                    ErrorStations.push(csvContent[i]);
+
+                }
+            }   
+            else {
+                console.log("Error at station :" + csvContent[i][0]);
+                ErrorStations.push(csvContent[i]);
+
+            }
+        }
+        else {
+            console.log("Error at station :" + csvContent[i][0]);
+            ErrorStations.push(csvContent[i]);
+        }
+    }
+    return ErrorStations;
+}
 
 function filterPM(){
 	console.log("inside filterPM")
@@ -344,6 +422,8 @@ function csvFunction(data)
 	csvData = data;
 }
 
+
+
 function stickyFunc(){
 	if (window.pageYOffset >= sticky) {
 		mapElement.classList.add("sticky");
@@ -356,7 +436,8 @@ function createContentString(station_number,temp,humididty,pmatter){
 	var contentString = '<h1 class= "contentstring"> REMOTE STATION' + station_number + '</h1>'+
 						'<p>Temperature: '+ temp + ' </p>'+
 						'<p>Humididty: '+ humididty + ' </p>' +
-						'<p>Particulate matter: ' + pmatter +' </p>';
+                        '<p>Particulate matter: ' + pmatter + ' </p>';
+        
 	return contentString;
 }
 

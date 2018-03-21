@@ -87,6 +87,9 @@ th {
     display: block;
 }
 
+#highlight {
+    background: #ff6666;
+}
 .dropdown-content a:hover {background-color: #ddd}
 
 .show {display:block;}
