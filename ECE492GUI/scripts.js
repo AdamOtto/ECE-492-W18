@@ -14,6 +14,8 @@ $(document).ready(function() {
 var csvData;
 var csvHeader = [];
 var csvContent = [];
+var BadStations = [];
+var dateCol;
 var map;
 //window.onscroll = function() {stickyFunc()};
 var mapElement;
@@ -81,10 +83,11 @@ function initContent(header, body) {
 	htmlCode += '</tr>';
 	htmlCode += '</thead>';
     htmlCode += '<tbody>';
-
-    var dateCol = findDateCol(csvHeader, csvContent);
-    var BadStations = checklastcall(csvContent, dateCol);
-    console.log(BadStations);
+    if (GetNowPressed == true) {
+        dateCol = findDateCol(csvHeader, csvContent);
+        BadStations = checklastcall(csvContent, dateCol);
+        console.log(BadStations);
+    }
 
 	for (var row = 0; row < body.length - 1; row++) {
 		//htmlCode += '<tr>';
@@ -301,7 +304,7 @@ function checklastcall(csvContent, dateCol) {
     time = new Date(time.getTime());
     var ErrorStations = []
     for (var i = 0; i < csvContent.length-1; i++) {
-        splitDateFormat = csvContent[i][8].split(" ");
+        splitDateFormat = csvContent[i][dateCol - 1].split(" ");
         splitYearMonthDate = splitDateFormat[0].split("-");
         splitHourMinSec = splitDateFormat[1].split(":");
         if ((time.getFullYear() - splitYearMonthDate[0]) == 0) {
