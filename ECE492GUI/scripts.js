@@ -14,6 +14,8 @@ $(document).ready(function() {
 var csvData;
 var csvHeader = [];
 var csvContent = [];
+var BadStations = [];
+var dateCol;
 var map;
 //window.onscroll = function() {stickyFunc()};
 var mapElement;
@@ -23,6 +25,7 @@ var FilterType = "ShowAll";
 const timerInterval = 60;
 var timerVal = timerInterval;
 var timerEnabled = true;
+var GetNowPressed = false;
 
 function init(){
 	console.log("init started...");
@@ -85,10 +88,11 @@ function initContent(header, body) {
 	htmlCode += '</tr>';
 	htmlCode += '</thead>';
     htmlCode += '<tbody>';
-
-    var dateCol = findDateCol(csvHeader, csvContent);
-    var BadStations = checklastcall(csvContent, dateCol);
-    console.log(BadStations);
+    if (GetNowPressed == true) {
+        dateCol = findDateCol(csvHeader, csvContent);
+        BadStations = checklastcall(csvContent, dateCol);
+        console.log(BadStations);
+    }
 
 	for (var row = 0; row < body.length - 1; row++) {
 		//htmlCode += '<tr>';
@@ -96,7 +100,7 @@ function initContent(header, body) {
 		var longitude = 0;
 		var temperature = 0;
         var markerColor = 'http://maps.google.com/mapfiles/ms/icons/green-dot.png';
-        if (BadStations.includes(body[row]) == true) {
+        if ((BadStations.includes(body[row]) == true) && (GetNowPressed == true)) {
             htmlCode += '<tr id ="highlight">';
         }
         else {
@@ -305,7 +309,7 @@ function checklastcall(csvContent, dateCol) {
     time = new Date(time.getTime());
     var ErrorStations = []
     for (var i = 0; i < csvContent.length-1; i++) {
-        splitDateFormat = csvContent[i][8].split(" ");
+        splitDateFormat = csvContent[i][dateCol - 1].split(" ");
         splitYearMonthDate = splitDateFormat[0].split("-");
         splitHourMinSec = splitDateFormat[1].split(":");
         if ((time.getFullYear() - splitYearMonthDate[0]) == 0) {
@@ -533,7 +537,8 @@ function callServerTime(filterTime,FilterType){
 }
 
 function getNow(){
-	timestamp = Date.parse( document.getElementById('textDate').value );
+    timestamp = Date.parse(document.getElementById('textDate').value);
+    GetNowPressed = true;
 	if(isNaN(timestamp)==false)
 	{
 		time = parseDateString(document.getElementById('textDate').value)
@@ -549,7 +554,8 @@ function getNow(){
 }
 
 function getPrevDate()
-{
+{   
+    GetNowPressed = false;
 	time = new Date(time - (10 * 60000));
 	var dt = time.toISOString().slice(0, 19).replace('T', ' ');
 	document.getElementById('textDate').value = dt;
@@ -558,6 +564,7 @@ function getPrevDate()
 
 function getNextDate()
 {
+    GetNowPressed = false;
 	time = new Date(time.getTime() + (10 * 60000));
 	dt = time.toISOString().slice(0, 19).replace('T', ' ');
     document.getElementById('textDate').value = dt;
