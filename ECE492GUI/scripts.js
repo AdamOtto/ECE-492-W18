@@ -19,8 +19,8 @@ var map;
 var mapElement;
 var sticky;
 var time;
-var FilterType = "ShowAll"
-
+var FilterType = "ShowAll";
+var GetNowPressed = false;
 function init(){
 	console.log("init started...");
 	time = new Date();
@@ -92,7 +92,7 @@ function initContent(header, body) {
 		var longitude = 0;
 		var temperature = 0;
         var markerColor = 'http://maps.google.com/mapfiles/ms/icons/green-dot.png';
-        if (BadStations.includes(body[row]) == true) {
+        if ((BadStations.includes(body[row]) == true) && (GetNowPressed == true)) {
             htmlCode += '<tr id ="highlight">';
         }
         else {
@@ -529,7 +529,8 @@ function callServerTime(filterTime,FilterType){
 }
 
 function getNow(){
-	timestamp = Date.parse( document.getElementById('textDate').value );
+    timestamp = Date.parse(document.getElementById('textDate').value);
+    GetNowPressed = true;
 	if(isNaN(timestamp)==false)
 	{
 		time = parseDateString(document.getElementById('textDate').value)
@@ -545,7 +546,8 @@ function getNow(){
 }
 
 function getPrevDate()
-{
+{   
+    GetNowPressed = false;
 	time = new Date(time - (10 * 60000));
 	var dt = time.toISOString().slice(0, 19).replace('T', ' ');
 	document.getElementById('textDate').value = dt;
@@ -554,6 +556,7 @@ function getPrevDate()
 
 function getNextDate()
 {
+    GetNowPressed = false;
 	time = new Date(time.getTime() + (10 * 60000));
 	dt = time.toISOString().slice(0, 19).replace('T', ' ');
     document.getElementById('textDate').value = dt;
