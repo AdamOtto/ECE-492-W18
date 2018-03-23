@@ -12,6 +12,7 @@
         <h1>Base Station GUI</h1>
 		<div class = "dropdown">
 
+		<!--
 		<button onclick = "myFunction()" class ="dropbtn"> Dropdown </button>
 		<div id = "myDropdown" class = "dropdown-content">
 			<a onclick = "filterTemp()"> Temperature </a>
@@ -20,35 +21,68 @@
             <a onclick = "filterVolt()"> Voltage</a>
 			<a onclick = "filterShowAll()"> Show all </a>
 				</div>
-			</div>
+		</div>
+		-->
         <script src="scripts.js"></script>
+        
+        <table>
+        	<thead>
+        		<th></th>
+        		<th align="right">
+        			<button onclick = "myFunction()" class ="dropbtn"> Dropdown </button>
+					<div id = "myDropdown" class = "dropdown-content" align="right">
+						<a onclick = "filterTemp()"> Temperature </a>
+						<a onclick = "filterHumid()"> Humidity </a>
+						<a onclick = "filterPM()"> Particulate Matter </a>
+			            <a onclick = "filterVolt()"> Voltage</a>
+						<a onclick = "filterShowAll()"> Show all </a>
+					</div>
+        		</th>
+        	</thead>
+        	<tbody>
+        	<tr>
+        		<td width="1600px" height="330px">
+        			<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB1-4XWM8LnJMhGsl4XIvcSyrU_pacYTxc" type="text/javascript"></script>
+			        <div id="googleMap" class="map"></div>
+        		</td>
+        		<td width="300px" height="330px">
+        			<div>
+        				<img src ="temperature_scale.png" alt = "temp scale" width="150px" height="330px" align="right">
+        			</div>
+        		</td>
+        	</tr>
+        	</tbody>
+        </table>
+        <!-- 
         <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB1-4XWM8LnJMhGsl4XIvcSyrU_pacYTxc" type="text/javascript"></script>
 		<div id="fixedDiv" class="body">
 			<img src ="temperature_scale.png" alt = "temp scale" class = "temp_pic">
         	<div id="googleMap" class="map">
 				</div>
         </div>
-        
-        <div>
+        -->
+        <div align="center">
         	<table>
+        		<tbody>
         		<tr><td>Time until Automatic update. <button id='timerPause' onclick="pauseTimer()">Pause</button></td></tr>
-        		<tr><td id="timer"></td></tr>
+        		<tr><td id="timer" align="center"></td></tr>
+        		</tbody>
         	</table>
         </div>
         
-        <div id="content"></div>
-		<div>
+        <div id="content" align="center"></div>
+		<div align="center">
 			<table>
 				<tr>
 					<td>
-						<button id="nextButton" onclick="getNextDate()">Get earlier data</button>
+						<button id="nextButton" onclick="getNextDate()">+10 minutes</button>
 					</td>
 					<td>
 						<input type="text" id="textDate"> </input>
-						<button id="getButton" onclick="getNow()">Get Now</button>
+						<button id="getButton" onclick="getNow()"><- get this time</button>
 					</td>
 					<td>
-						<button id="prevButton" onclick="getPrevDate()">Get later data</button>
+						<button id="prevButton" onclick="getPrevDate()">-10 minutes</button>
 					</td>
 				</tr>
 			</table>

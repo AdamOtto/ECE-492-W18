@@ -1,7 +1,7 @@
 /**
  * @author adamo
  */
-
+/*
 $(document).ready(function() {
 	$.ajax({	
 		type: "GET",	
@@ -10,7 +10,7 @@ $(document).ready(function() {
 		success: function(data) {csvFunction(data);}	
 	});
 });
-
+*/
 var csvData;
 var csvHeader = [];
 var csvContent = [];
