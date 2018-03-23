@@ -16,8 +16,8 @@ void setup() {
 
 void loop() {
   
-  float dust25; //Store PM2.5 (fine)
-  float dust100; //Store PM10 (coarse)
+  float dust25; 
+  float dust100; 
   Serial.println("Start");
   dust25 = dust.getPM2();
   dust100 = dust.getPM10();

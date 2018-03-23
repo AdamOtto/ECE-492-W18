@@ -40,10 +40,16 @@ void setup() {
   fonaSerial->print("AT+CNMI=2,1\r\n");
 }
 
-void ackSMS(char* callerIDbuffer){
+void ackSMS(char* PhoneNum){
     char txtmsg[80];
     snprintf(txtmsg, sizeof(txtmsg), "A");
-    fona.sendSMS(callerIDbuffer, txtmsg);
+    fona.sendSMS(PhoneNum, txtmsg);
+}
+
+void changefreqSMS(char* PhoneNum, int newinterval){
+    char txtmsg[80];
+    snprintf(txtmsg, sizeof(txtmsg), "T,%d", newinterval);
+    fona.sendSMS(PhoneNum, txtmsg);
 }
 
 void extractSMS(char* smsBuffer, char* fonaNotificationBuffer, char* callerIDbuffer){      
@@ -106,14 +112,13 @@ void loop() {
     if(smsBuffer[0]=='D'){
       //Serial.println("Received data, now sending ack...");
       ackSMS(callerIDBuffer);
-      File datafile = SD.open("testlog2.csv", FILE_WRITE);
+      File datafile = SD.open("mylog.csv", FILE_WRITE);
       if (datafile){
         datafile.println(smsBuffer);
         datafile.close();
-        Serial.println(smsBuffer);
-      }else{
-        Serial.println("Couldn't open file");
+        //Serial.println(smsBuffer);
       }
+      Serial.println(smsBuffer);
     }
   }
 }   
