@@ -118,7 +118,7 @@ void loop() {
         datafile.close();
         //Serial.println(smsBuffer);
       }
-      Serial.println(smsBuffer);
+     // Serial.println("?%s,%s!",callerIDBuffer,&smsBuffer[2]);
     }
   }
 }   
