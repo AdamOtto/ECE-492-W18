@@ -31,7 +31,7 @@ function init(){
 	console.log("init started...");
 	time = new Date();
 	document.getElementById('textDate').value =  time.toISOString().slice(0, 19).replace('T', ' ');;
-	window.onscroll = function() {stickyFunc()};
+	//window.onscroll = function() {stickyFunc()};
 	mapElement = document.getElementById("fixedDiv");
 	//sticky = mapElement.offsetTop;
 	initMap();
