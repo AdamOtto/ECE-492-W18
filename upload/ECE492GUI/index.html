@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
@@ -6,29 +6,93 @@
         <link rel="stylesheet" type="text/css" href="style.css">
         <title>New Web Project</title>
     </head>
-    <body onload="init()">
+    <body onload="init()" class="bodyBack">
     	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     	
-        <h1>Base Station GUI</h1>
+        <h1 align="center">Base Station GUI</h1>
 		<div class = "dropdown">
-		      <input onclick="deleteMarkers();" type=button value="Delete Markers">
 
+		<!--
 		<button onclick = "myFunction()" class ="dropbtn"> Dropdown </button>
 		<div id = "myDropdown" class = "dropdown-content">
-			<a href = "home"> Temperature </a>
-			<a href = "home"> Humidity </a>
-			<a href = "home"> Particulate Matter </a>
+			<a onclick = "filterTemp()"> Temperature </a>
+			<a onclick = "filterHumid()"> Humidity </a>
+			<a onclick = "filterPM()"> Particulate Matter </a>
+            <a onclick = "filterVolt()"> Voltage</a>
+			<a onclick = "filterShowAll()"> Show all </a>
 				</div>
-			</div>
+		</div>
+		-->
         <script src="scripts.js"></script>
+        
+        <table>
+        	<thead>
+        		<th></th>
+        		<th align="right">
+        			<button onclick = "myFunction()" class ="dropbtn"> Dropdown </button>
+					<div id = "myDropdown" class = "dropdown-content" align="right">
+						<a onclick = "filterTemp()"> Temperature </a>
+						<a onclick = "filterHumid()"> Humidity </a>
+						<a onclick = "filterPM()"> Particulate Matter </a>
+			            <a onclick = "filterVolt()"> Voltage</a>
+						<a onclick = "filterShowAll()"> Show all </a>
+					</div>
+        		</th>
+        	</thead>
+        	<tbody>
+        	<tr>
+        		<td width="1600px" height="330px">
+        			<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB1-4XWM8LnJMhGsl4XIvcSyrU_pacYTxc" type="text/javascript"></script>
+			        <div id="googleMap" class="map"></div>
+        		</td>
+        		<td width="300px" height="330px">
+        			<div>
+        				<img src ="temperature_scale.png" alt = "temp scale" width="150px" height="330px" align="right">
+        			</div>
+        		</td>
+        	</tr>
+        	</tbody>
+        </table>
+        <!-- 
         <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB1-4XWM8LnJMhGsl4XIvcSyrU_pacYTxc" type="text/javascript"></script>
 		<div id="fixedDiv" class="body">
 			<img src ="temperature_scale.png" alt = "temp scale" class = "temp_pic">
         	<div id="googleMap" class="map">
 				</div>
         </div>
-        <div id="content"></div>
-		
+        -->
+        <div align="center">
+        	<table>
+        		<tbody>
+        		<tr><td>Time until Automatic update. <button id='timerPause' onclick="pauseTimer()">Pause</button></td></tr>
+        		<tr><td id="timer" align="center"></td></tr>
+        		</tbody>
+        	</table>
+        </div>
+        
+        <div id="content" align="center"></div>
+		<div align="center">
+			<table>
+				<tr>
+					<td>
+						<button id="nextButton" onclick="getNextDate()">+10 minutes</button>
+					</td>
+					<td>
+						<input type="text" id="textDate"> </input>
+						<button id="getButton" onclick="getNow()"><- get this time</button>
+					</td>
+					<td>
+						<button id="prevButton" onclick="getPrevDate()">-10 minutes</button>
+					</td>
+					<td>
+						<form method="post" action="/">
+							<input type="number" id="numMinutes" name="pollPeriod"> </input>
+							<input type="submit" value="Reset Polling Frequency (Minute)"></button>
+						</form>
+					</td>
+				</tr>
+			</table>
+		</div>
 
     </body>
 </html>

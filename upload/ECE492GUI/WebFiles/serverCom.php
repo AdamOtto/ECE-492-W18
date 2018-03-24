@@ -1,21 +1,24 @@
 <?php
 	header("Access-Control-Allow-Origin: *");
 	$servername = "localhost";
-	$username = "root";
-	$password = "";
-	$dbname = "ece492database";
+	$username = "id5126683_rootuser";
+	$password = "groot";
+	$dbname = "id5126683_ece492database";
 	/*$q = intval($_GET['q']);*/
 	// Create connection
 	$conn = mysqli_connect($servername, $username, $password, $dbname);
+
 	// Check connection
 	if (!$conn) {
 	    die("Connection failed: " . mysqli_error($conn));
 	}
-	//mysqli_select_db($conn, "remotesensor");
+	mysqli_select_db($conn, "id5126683_ece492database");
+	
 	$sql = "SELECT DISTINCT *
-FROM remotestation as r
-WHERE r.Date = (SELECT MAX(Date) from remotestation as r2 where r2.StationName = r.StationName AND r2.Date < NOW())
-ORDER by r.StationName ASC;";
+	FROM remotestation as r
+	WHERE r.Date = (SELECT MAX(Date) from remotestation as r2 where r2.StationName = r.StationName AND r2.Date < NOW())
+	ORDER by r.StationName ASC;";
+	
 	$result = mysqli_query($conn, $sql);
 	$resultCheck = mysqli_num_rows($result);
 	echo "StationName,Latitude,Longitude,Temperature,Dust10,Dust2.5,Humidity,Voltage%,Date\n";
@@ -32,8 +35,6 @@ ORDER by r.StationName ASC;";
 	        $row["Battery %"] . ","  .
 	        $row["Date"] . "\n";
 	    }
-	} else {
-	    echo "Didn't get shit yo";
 	}
 	mysqli_close($conn);
 ?>

@@ -1,7 +1,7 @@
 /**
  * @author adamo
  */
-/*
+
 $(document).ready(function() {
 	$.ajax({	
 		type: "GET",	
@@ -10,35 +10,28 @@ $(document).ready(function() {
 		success: function(data) {csvFunction(data);}	
 	});
 });
-*/
+
 var csvData;
 var csvHeader = [];
 var csvContent = [];
-var BadStations = [];
-var dateCol;
 var map;
 //window.onscroll = function() {stickyFunc()};
 var mapElement;
 var sticky;
 var time;
-var FilterType = "ShowAll";
-const timerInterval = 60;
-var timerVal = timerInterval;
-var timerEnabled = true;
-var GetNowPressed = false;
+var FilterType = "ShowAll"
 
 function init(){
 	console.log("init started...");
 	time = new Date();
 	document.getElementById('textDate').value =  time.toISOString().slice(0, 19).replace('T', ' ');;
-	//window.onscroll = function() {stickyFunc()};
+	window.onscroll = function() {stickyFunc()};
 	mapElement = document.getElementById("fixedDiv");
 	//sticky = mapElement.offsetTop;
 	initMap();
 	//parseData(csvData);
 	callServer();
 	//initContent(csvHeader, csvContent);
-	setInterval(timer, 1000);
 	console.log("init end.");
 }
 
@@ -87,31 +80,19 @@ function initContent(header, body) {
 	}
 	htmlCode += '</tr>';
 	htmlCode += '</thead>';
-    htmlCode += '<tbody>';
-    if (GetNowPressed == true) {
-        dateCol = findDateCol(csvHeader, csvContent);
-        BadStations = checklastcall(csvContent, dateCol);
-        console.log(BadStations);
-    }
-
+	htmlCode += '<tbody>';
+	
 	for (var row = 0; row < body.length - 1; row++) {
-		//htmlCode += '<tr>';
+		htmlCode += '<tr>';
 		var latitude = 0;
 		var longitude = 0;
 		var temperature = 0;
-        var markerColor = 'http://maps.google.com/mapfiles/ms/icons/green-dot.png';
-        if ((BadStations.includes(body[row]) == true) && (GetNowPressed == true)) {
-            htmlCode += '<tr id ="highlight">';
-        }
-        else {
-            htmlCode += '<tr>';
-        }
-        for (var rowCell = 0; rowCell < body[row].length; rowCell++) {
+		var markerColor ='http://maps.google.com/mapfiles/ms/icons/green-dot.png';
+		for (var rowCell = 0; rowCell < body[row].length; rowCell++) {
 			if(rowCell == hlat)
 				latitude = parseInt( body[row][rowCell] );
 			if(rowCell == hlon)
-                longitude = parseInt(body[row][rowCell]);
-
+				longitude = parseInt( body[row][rowCell] );
 			htmlCode += '<td>';
 			htmlCode += body[row][rowCell];
 			htmlCode += '</td>';
@@ -212,8 +193,7 @@ function callServerTemp(filterTime){
         		"sec=" + filterTime.getUTCSeconds();
     FilterType = "Temp"
 	console.log(req)
-    xmlhttp.open("GET","http://localhost/serverFilterTemp.php" + req, true);
-    findDateCol(csvHeader, csvContent);
+    xmlhttp.open("GET","http://ece492group4.000webhostapp.com/serverFilterTemp.php" + req, true);
     xmlhttp.send();
 	
 
@@ -250,12 +230,12 @@ function callServerVolt(filterTime) {
         "sec=" + filterTime.getUTCSeconds();
     FilterType = "VOLT"
     console.log(req)
-    xmlhttp.open("GET", "http://localhost/serverFilterVolt.php" + req, true);
+    xmlhttp.open("GET", "http://ece492group4.000webhostapp.com/serverFilterVolt.php" + req, true);
     xmlhttp.send();
 }
 
 function filterHumid() {
-    console.log("inside filterHumid")
+    console.log("inside filterPM")
     time = new Date(time.getTime() + (10 * 60000));
     dt = time.toISOString().slice(0, 19).replace('T', ' ');
     document.getElementById('textDate').value = dt;
@@ -263,7 +243,7 @@ function filterHumid() {
 }
 
 function callServerHumid(filterTime) {
-    console.log("inside callServerHumid")
+    console.log("inside callServerPM")
     if (window.XMLHttpRequest) {
         // code for IE7+, Firefox, Chrome, Opera, Safari
         xmlhttp = new XMLHttpRequest({ mozSystem: true });
@@ -285,77 +265,11 @@ function callServerHumid(filterTime) {
         "sec=" + filterTime.getUTCSeconds();
     FilterType = "HUMID"
     console.log(req)
-    xmlhttp.open("GET", "http://localhost/serverHumid.php" + req, true);
-    var dateCol = findDateCol(csvHeader, csvContent);
-    var BadStations = checklastcall(csvContent, dateCol);
-    console.log(BadStations);
+    xmlhttp.open("GET", "http://ece492group4.000webhostapp.com/serverHumid.php" + req, true);
     xmlhttp.send();
 }
 
 
-function findDateCol(csvHeader, csvContent) {
-    console.log("the csvheader is: " + csvHeader);
-    console.log("the csvContent is: " + csvContent);
-    for (var i = 0; i < csvHeader.length; i++) {
-        console.log(csvHeader[i]);
-        if (csvHeader[i] == "Date") {
-            console.log("Found Date the counter is: " + i);
-        }
-    }
-    return i
-}
-
-function checklastcall(csvContent, dateCol) {
-    time = new Date(time.getTime());
-    var ErrorStations = []
-    for (var i = 0; i < csvContent.length-1; i++) {
-        splitDateFormat = csvContent[i][dateCol - 1].split(" ");
-        splitYearMonthDate = splitDateFormat[0].split("-");
-        splitHourMinSec = splitDateFormat[1].split(":");
-        if ((time.getFullYear() - splitYearMonthDate[0]) == 0) {
-            if (((time.getMonth() + 1) - splitYearMonthDate[1]) == 0) {
-
-                if ((time.getDate() - splitYearMonthDate[2]) == 0) {
-                    if ((time.getHours() - splitHourMinSec[0]) == 0) {
-                        console.log("the miniutes are going to be: " + splitHourMinSec[1]);
-                        console.log(time.getUTCMinutes());
-                        console.log(time.getMinutes() - splitHourMinSec[1]);
-                        if ((time.getMinutes() - splitHourMinSec[1]) <= 10) {
-                            console.log("inside here and the statointhat passed is: " + csvContent[i]);
-                        }
-                        else {
-                            console.log("Error at station miniutes:" + csvContent[i][0]);
-                            console.log(splitHourMinSec[1]);
-                            console.log(time.getUTCMinutes());
-                            ErrorStations.push(csvContent[i]);
-                        }
-                    }
-                    else {
-                        console.log("Error at station Hours :" + csvContent[i][0]);
-                        console.log(splitHourMinSec[0]);
-                        console.log(time.getHours());
-                        ErrorStations.push(csvContent[i]);
-                    }
-                }
-                else {
-                    console.log("Error at station :" + csvContent[i][0]);
-                    ErrorStations.push(csvContent[i]);
-
-                }
-            }   
-            else {
-                console.log("Error at station :" + csvContent[i][0]);
-                ErrorStations.push(csvContent[i]);
-
-            }
-        }
-        else {
-            console.log("Error at station :" + csvContent[i][0]);
-            ErrorStations.push(csvContent[i]);
-        }
-    }
-    return ErrorStations;
-}
 
 function filterPM(){
 	console.log("inside filterPM")
@@ -396,7 +310,7 @@ function callServerPM(filterTime){
     			"min=" + filterTime.getUTCMinutes() + "&" + 
     			"sec=" + filterTime.getUTCSeconds();
     FilterType = "PM"		
-    xmlhttp.open("GET","http://localhost/serverFilterPM.php"+ req,true);
+    xmlhttp.open("GET","http://ece492group4.000webhostapp.com/serverFilterPM.php"+ req,true);
     xmlhttp.send();
 }	
 	  
@@ -428,8 +342,6 @@ function csvFunction(data)
 	csvData = data;
 }
 
-
-
 function stickyFunc(){
 	if (window.pageYOffset >= sticky) {
 		mapElement.classList.add("sticky");
@@ -442,8 +354,7 @@ function createContentString(station_number,temp,humididty,pmatter){
 	var contentString = '<h1 class= "contentstring"> REMOTE STATION' + station_number + '</h1>'+
 						'<p>Temperature: '+ temp + ' </p>'+
 						'<p>Humididty: '+ humididty + ' </p>' +
-                        '<p>Particulate matter: ' + pmatter + ' </p>';
-        
+						'<p>Particulate matter: ' + pmatter +' </p>';
 	return contentString;
 }
 
@@ -503,7 +414,7 @@ function callServer() {
             initContent(csvHeader, csvContent);
         }
     };
-    xmlhttp.open("GET","http://localhost/serverCom.php",true);
+    xmlhttp.open("GET","http://ece492group4.000webhostapp.com/serverCom.php",true);
     xmlhttp.send();
 }
 
@@ -532,13 +443,12 @@ function callServerTime(filterTime,FilterType){
         "filtertype=" + FilterType;
     console.log("inside callServerTime")
     //console.log(req)
-    xmlhttp.open("GET","http://localhost/DateFilter.php" + req,true);
+    xmlhttp.open("GET","http://ece492group4.000webhostapp.com/DateFilter.php" + req,true);
     xmlhttp.send();
 }
 
 function getNow(){
-    timestamp = Date.parse(document.getElementById('textDate').value);
-    GetNowPressed = true;
+	timestamp = Date.parse( document.getElementById('textDate').value );
 	if(isNaN(timestamp)==false)
 	{
 		time = parseDateString(document.getElementById('textDate').value)
@@ -554,8 +464,7 @@ function getNow(){
 }
 
 function getPrevDate()
-{   
-    GetNowPressed = false;
+{
 	time = new Date(time - (10 * 60000));
 	var dt = time.toISOString().slice(0, 19).replace('T', ' ');
 	document.getElementById('textDate').value = dt;
@@ -564,7 +473,6 @@ function getPrevDate()
 
 function getNextDate()
 {
-    GetNowPressed = false;
 	time = new Date(time.getTime() + (10 * 60000));
 	dt = time.toISOString().slice(0, 19).replace('T', ' ');
     document.getElementById('textDate').value = dt;
@@ -581,30 +489,4 @@ function parseDateString(datestr){
 	newTime.setUTCSeconds( datestr.substring(17,19) );
 	//console.log(newTime);
 	return newTime;
-}
-
-function timer(){
-	if(timerEnabled){
-		timerVal -= 1;
-		
-		if(timerVal <= 0){
-			timerVal = timerInterval;
-			callServer();
-		}
-	
-		document.getElementById('timer').innerHTML = timerVal;
-	}
-}
-
-function pauseTimer()
-{
-	if(timerEnabled){
-		timerEnabled = false;
-		document.getElementById('timerPause').innerHTML = "Start";
-	}
-	else
-	{
-		timerEnabled = true;
-		document.getElementById('timerPause').innerHTML = "Pause";
-	}
 }
