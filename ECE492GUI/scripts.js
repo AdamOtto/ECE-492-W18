@@ -23,6 +23,7 @@ const timerInterval = 60;
 var timerVal = timerInterval;
 var timerEnabled = true;
 var GetNowPressed = false;
+var infoWindowContent;
 
 function init(){
 	console.log("init started...");
@@ -65,11 +66,29 @@ function initContent(header, body) {
 	console.log("initContent started...");
 	var htmlCode = "<table>";
 	var hlat;
-	var hlon;
-	document.getElementById('content').innerHTML = "";
+    var hlon;
+    document.getElementById('content').innerHTML = "";
+    console.log("the filter type is: " + FilterType);
 	
-	var contentString = createContentString(1,190,20,39);	
-	var infoWindowContent = createInfoWindowContent(body);	
+
+    if (FilterType == "Temp") {
+        infoWindowContent = createInforWindowContentTemp(body);
+    }
+    if (FilterType == "HUMID") {
+        console.log("inside this if for humid");
+        infoWindowContent = createInforWindowContentHumid(body);
+        console.log(infoWindowContent);
+    }
+    if (FilterType == "PM") {
+        infoWindowContent = createInforWindowContentPM(body);
+    }
+    if (FilterType == "VOLT") {
+        infoWindowContent = createInforWindowContentVoltaged(body);
+    }
+    if (FilterType == "ShowAll") {
+        console.log("inside this else");
+        infoWindowContent = createInfoWindowContent(body);
+    }
 	var infoWindow = new google.maps.InfoWindow(),marker,row;
 	//console.log('The new infowindowcontent is ' + infoWindowContent);
 	
@@ -153,8 +172,10 @@ function initContent(header, body) {
 			//console.log(row);
 			google.maps.event.addListener(marker,'click',(function(marker,row){
 				return function(){
-					//console.log('setting the content to this' + row + infoWindowContent[row][0]);
-					infoWindow.setContent(infoWindowContent[row][0]);
+                    //console.log('setting the content to this' + row + infoWindowContent[row][0]);
+                    console.log("before this stuff: " + infoWindowContent);
+                    infoWindow.setContent(infoWindowContent[row][0]);
+                    console.log("the content is: " + infoWindowContent[row][0]);
 					infoWindow.open(map,marker);
 				}
 			})(marker,row));
@@ -436,17 +457,70 @@ function createContentString(station_number,temp,humididty,pmatter){
 	return contentString;
 }
 
+function createInforWindowContentTemp(data) {
+    var infoWindow = [];
+    for (var i = 0; i < data.length; i++) {
+        infoWindow.push(['<h1>' + data[i][0] + '</h1>' +
+            '<p>Latitude: ' + data[i][1] + '</p>' +
+            '<p>Longitude: ' + data[i][2] + '</p>' +
+            '<p>Temperature: ' + data[i][3] + '</p>' +
+            '<p>Date: ' + data[i][4] + '</p>']);
+    }
+    return infoWindow;
+
+} function createInforWindowContentHumid(data) {
+    var infoWindow = [];
+    for (var i = 0; i < data.length; i++) {
+        infoWindow.push(['<h1>' + data[i][0] + '</h1>' +
+            '<p>Latitude: ' + data[i][1] + '</p>' +
+            '<p>Longitude: ' + data[i][2] + '</p>' +
+            '<p>Humidity: ' + data[i][3] + '</p>' +
+            '<p>Date: ' + data[i][4] + '</p>']);
+    }
+    return infoWindow;
+}
+
+function createInforWindowContentVoltaged(data) {
+    var infoWindow = [];
+    for (var i = 0; i < data.length; i++) {
+        infoWindow.push(['<h1>' + data[i][0] + '</h1>' +
+            '<p>Latitude: ' + data[i][1] + '</p>' +
+            '<p>Longitude: ' + data[i][2] + '</p>' +
+            '<p>Voltage: ' + data[i][3] + '</p>' +
+            '<p>Date: ' + data[i][4] + '</p>']);
+    }
+    return infoWindow;
+}
+
+function createInforWindowContentPM(data) {
+    var infoWindow = [];
+    for (var i = 0; i < data.length; i++) {
+        infoWindow.push(['<h1>' + data[i][0] + '</h1>' +
+            '<p>Latitude: ' + data[i][1] + '</p>' +
+            '<p>Longitude: ' + data[i][2] + '</p>' +
+            '<p>Dust 1.0: ' + data[i][3] + '</p>' +
+            '<p>Dust 2.5: ' + data[i][4] + '</p>' + 
+            '<p>Date: ' + data[i][5] + '</p>']);
+    }
+    return infoWindow;
+}
+
+
 function createInfoWindowContent(data){
 	var infoWindow = [];
 	//console.log("inside createInfoWindowContent");
 	//console.log('the lenght of hte data is ' + data.length);
 	//console.log('that data at data[0]' + data[0][0] + ' ' + data[0][1] +' '+data[0][2] + ' '+data[0][3] +' '+data[0][4]);
 	for (var i = 0; i < data.length; i ++){
-		infoWindow.push([ '<h1>'+ data[i][0]+'</h1>' + 
-		'<p>Latitude: ' + data[i][1] +'</p>' +
-		'<p>Longitude: '+ data[i][2] +'</p>'+
-		'<p>Temperature: '+data[i][3] +'</p>'+ 
-		'<p>Particulate matter: '+data[i][4] +'</p>']);
+        infoWindow.push(['<h1>' + data[i][0] + '</h1>' +
+            '<p>Latitude: ' + data[i][1] + '</p>' +
+            '<p>Longitude: ' + data[i][2] + '</p>' +
+            '<p>Temperature: ' + data[i][3] + '</p>' +
+            '<p>Dust 1.0: ' + data[i][4] + '</p>' +
+            '<p>Dust 2.5: ' + data[i][5] + '</p>' +
+            '<p>Humidity: ' + data[i][6] + '</p>' +
+            '<p>Voltage%: ' + data[i][7] + '</p>' +
+            '<p>Date: ' + data[i][8] + '</p>']); 
 		//console.log('printing the data inside for loop' + data[i] );
 	}
 	//console.log('the infoWindow is now' + infoWindow);
