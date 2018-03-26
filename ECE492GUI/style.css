@@ -25,11 +25,11 @@ table {
 }
  
 tr:nth-child(even) {
-  background: rgba(212, 212, 212, 0.6)
+  background: rgba(212, 212, 212, 0.8)
   /*background: #d4d4d4;*/
 }
 tr:nth-child(odd) {
-  background: rgba(255, 255, 255, 0.6)
+  background: rgba(255, 255, 255, 0.8)
   /*background: #ffffff;*/
 }
 th, td {

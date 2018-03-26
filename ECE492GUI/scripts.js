@@ -46,6 +46,7 @@ function initMap() {
 	var mapProp= {
 	    center:new google.maps.LatLng(53.5444,-113.4909),
 	    zoom:5,
+	    gestureHandling: 'greedy'
 	};
 	//var marker = new google.maps.Marker({position:center});
 	
