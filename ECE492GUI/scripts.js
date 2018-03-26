@@ -17,9 +17,6 @@ var csvContent = [];
 var BadStations = [];
 var dateCol;
 var map;
-//window.onscroll = function() {stickyFunc()};
-var mapElement;
-var sticky;
 var time;
 var FilterType = "ShowAll";
 const timerInterval = 60;
@@ -29,16 +26,18 @@ var GetNowPressed = false;
 
 function init(){
 	console.log("init started...");
+	
 	time = new Date();
+	
 	document.getElementById('textDate').value =  time.toISOString().slice(0, 19).replace('T', ' ');;
-	//window.onscroll = function() {stickyFunc()};
-	mapElement = document.getElementById("fixedDiv");
-	//sticky = mapElement.offsetTop;
+	
 	initMap();
 	//parseData(csvData);
 	callServer();
 	//initContent(csvHeader, csvContent);
+	
 	setInterval(timer, 1000);
+	
 	console.log("init end.");
 }
 
@@ -428,16 +427,6 @@ function csvFunction(data)
 	csvData = data;
 }
 
-
-
-function stickyFunc(){
-	if (window.pageYOffset >= sticky) {
-		mapElement.classList.add("sticky");
- 	} else {
-		mapElement.classList.remove("sticky");
-	}
-}
-
 function createContentString(station_number,temp,humididty,pmatter){
 	var contentString = '<h1 class= "contentstring"> REMOTE STATION' + station_number + '</h1>'+
 						'<p>Temperature: '+ temp + ' </p>'+
@@ -446,8 +435,6 @@ function createContentString(station_number,temp,humididty,pmatter){
         
 	return contentString;
 }
-
-
 
 function createInfoWindowContent(data){
 	var infoWindow = [];

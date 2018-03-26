@@ -27,25 +27,27 @@
         
         <table>
         	<thead>
-        		<th></th>
-        		<th align="right">
-        			<button onclick = "myFunction()" class ="dropbtn"> Dropdown </button>
-					<div id = "myDropdown" class = "dropdown-content" align="right">
-						<a onclick = "filterTemp()"> Temperature </a>
-						<a onclick = "filterHumid()"> Humidity </a>
-						<a onclick = "filterPM()"> Particulate Matter </a>
-			            <a onclick = "filterVolt()"> Voltage</a>
-						<a onclick = "filterShowAll()"> Show all </a>
-					</div>
-        		</th>
+        		<tr class="TransparentRows">
+	        		<th></th>
+	        		<th align="right">
+	        			<button onclick = "myFunction()" class ="dropbtn"> Dropdown </button>
+						<div id = "myDropdown" class = "dropdown-content" align="right">
+							<a onclick = "filterTemp()"> Temperature </a>
+							<a onclick = "filterHumid()"> Humidity </a>
+							<a onclick = "filterPM()"> Particulate Matter </a>
+				            <a onclick = "filterVolt()"> Voltage</a>
+							<a onclick = "filterShowAll()"> Show all </a>
+						</div>
+	        		</th>
+        		</tr>
         	</thead>
         	<tbody>
-        	<tr>
-        		<td width="1600px" height="330px">
+        	<tr class="TransparentRows">
+        		<td width="1600px" height="450px">
         			<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB1-4XWM8LnJMhGsl4XIvcSyrU_pacYTxc" type="text/javascript"></script>
 			        <div id="googleMap" class="map"></div>
         		</td>
-        		<td width="300px" height="330px">
+        		<td width="300px" height="450px">
         			<div>
         				<img src ="temperature_scale.png" alt = "temp scale" width="150px" height="330px" align="right">
         			</div>
