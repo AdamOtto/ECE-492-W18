@@ -156,17 +156,13 @@ function initContent(header, body) {
 		//console.log("Adding marker " + row + ": Lat: " + latitude + ", Long: " + longitude);		
 		//console.log("the temperature is " + body[row][3]);
 		temperature = parseInt(body[row][3]);
-		//console.log(-10 > temperature);
-		//console.log(-temperature > -20);
 		if(temperature <= -25){
 			markerColor ='http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
 		}
 		if( (-10 > temperature )&&( temperature > -20)){
-			//console.log("inside this other if");
 			markerColor = 'http://maps.google.com/mapfiles/ms/icons/ltblue-dot.png';
 		}
 		if(( 0 > temperature)&&(temperature > -10)){
-			//console.log("im inside here ");
 			markerColor = 'http://maps.google.com/mapfiles/ms/icons/green-dot.png';
 		}
 		if((temperature > 0) && ( temperature < 10)){
@@ -554,9 +550,6 @@ function createInforWindowContentPM(data) {
 
 function createInfoWindowContent(data){
 	var infoWindow = [];
-	//console.log("inside createInfoWindowContent");
-	//console.log('the lenght of hte data is ' + data.length);
-	//console.log('that data at data[0]' + data[0][0] + ' ' + data[0][1] +' '+data[0][2] + ' '+data[0][3] +' '+data[0][4]);
 	for (var i = 0; i < data.length; i ++){
         infoWindow.push(['<h1>' + data[i][0] + '</h1>' +
             '<p>Latitude: ' + data[i][1] + '</p>' +
@@ -567,9 +560,7 @@ function createInfoWindowContent(data){
             '<p>Humidity: ' + data[i][6] + '</p>' +
             '<p>Voltage%: ' + data[i][7] + '</p>' +
             '<p>Date: ' + data[i][8] + '</p>']); 
-		//console.log('printing the data inside for loop' + data[i] );
 	}
-	//console.log('the infoWindow is now' + infoWindow);
 	return infoWindow;
 }
 
