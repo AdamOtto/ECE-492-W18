@@ -15,7 +15,9 @@ var csvData;
 var csvHeader = [];
 var csvContent = [];
 var BadStations = [];
+var lowBatteryStations = [];
 var dateCol;
+var voltCol;
 var map;
 var time;
 var FilterType = "ShowAll";
@@ -78,7 +80,6 @@ function initContent(header, body) {
     if (FilterType == "HUMID") {
         console.log("inside this if for humid");
         infoWindowContent = createInforWindowContentHumid(body);
-        console.log(infoWindowContent);
     }
     if (FilterType == "PM") {
         infoWindowContent = createInforWindowContentPM(body);
@@ -92,7 +93,8 @@ function initContent(header, body) {
     }
 	var infoWindow = new google.maps.InfoWindow(),marker,row;
 	//console.log('The new infowindowcontent is ' + infoWindowContent);
-	
+
+
 	htmlCode += '<thead><tr>'
 	for (var h = 0; h < header.length; h++) {
 		htmlCode += '<th>';
@@ -107,10 +109,15 @@ function initContent(header, body) {
 	htmlCode += '</tr>';
 	htmlCode += '</thead>';
     htmlCode += '<tbody>';
+
+    voltCol = findVolCol(csvHeader);
     if (GetNowPressed == true) {
         dateCol = findDateCol(csvHeader, csvContent);
         BadStations = checklastcall(csvContent, dateCol);
-        console.log(BadStations);
+        checkVoltageLevel(csvHeader, csvContent);
+    }
+    if (voltCol != false) {
+        lowBatteryStations = checkVoltageLevel(csvHeader,csvContent);
     }
 
 	for (var row = 0; row < body.length - 1; row++) {
@@ -119,12 +126,22 @@ function initContent(header, body) {
 		var longitude = 0;
 		var temperature = 0;
         var markerColor = 'http://maps.google.com/mapfiles/ms/icons/green-dot.png';
+       
         if ((BadStations.includes(body[row]) == true) && (GetNowPressed == true)) {
+            console.log("inside here");
+            console.log(BadStations);
             htmlCode += '<tr id ="highlight">';
         }
+   
+        else if ((lowBatteryStations.includes(body[row]) == true) && (voltCol != true)) {
+            console.log("inside this second if");
+            htmlCode += '<tr id ="highlightVolt">';
+        }
+
         else {
             htmlCode += '<tr>';
         }
+
         for (var rowCell = 0; rowCell < body[row].length; rowCell++) {
 			if(rowCell == hlat)
 				latitude = parseInt( body[row][rowCell] );
@@ -186,7 +203,8 @@ function initContent(header, body) {
 	}
 	htmlCode += '</tbody>';
 	htmlCode += '</table>';
-	document.getElementById('content').innerHTML = htmlCode;
+    document.getElementById('content').innerHTML = htmlCode;
+    GetNowPressed = false;
 	console.log("initContent end.");
 }
 
@@ -232,9 +250,8 @@ function callServerTemp(filterTime){
     			"min=" + filterTime.getUTCMinutes() + "&" + 	
         		"sec=" + filterTime.getUTCSeconds();
     FilterType = "Temp"
-	console.log(req)
+    console.log(req)
     xmlhttp.open("GET","http://localhost/serverFilterTemp.php" + req, true);
-    findDateCol(csvHeader, csvContent);
     xmlhttp.send();
 	
 
@@ -263,6 +280,8 @@ function callServerVolt(filterTime) {
             initContent(csvHeader, csvContent);
         }
     };
+
+
     var req = "?year=" + filterTime.getFullYear() + "&" +
         "month=" + (filterTime.getMonth() + 1) + "&" +
         "day=" + filterTime.getDate() + "&" +
@@ -270,6 +289,7 @@ function callServerVolt(filterTime) {
         "min=" + filterTime.getUTCMinutes() + "&" +
         "sec=" + filterTime.getUTCSeconds();
     FilterType = "VOLT"
+    VoltagePressed = true;
     console.log(req)
     xmlhttp.open("GET", "http://localhost/serverFilterVolt.php" + req, true);
     xmlhttp.send();
@@ -307,37 +327,45 @@ function callServerHumid(filterTime) {
     FilterType = "HUMID"
     console.log(req)
     xmlhttp.open("GET", "http://localhost/serverHumid.php" + req, true);
-    var dateCol = findDateCol(csvHeader, csvContent);
-    var BadStations = checklastcall(csvContent, dateCol);
-    console.log(BadStations);
     xmlhttp.send();
 }
 
 
 function findDateCol(csvHeader, csvContent) {
-    console.log("the csvheader is: " + csvHeader);
-    console.log("the csvContent is: " + csvContent);
     for (var i = 0; i < csvHeader.length; i++) {
         console.log(csvHeader[i]);
         if (csvHeader[i] == "Date") {
-            console.log("Found Date the counter is: " + i);
+            return i;
         }
     }
     return i
 }
 
+
+function findVolCol(csvHeader) {
+    console.log("inside findVolVol");
+    for (var i = 0; i < csvHeader.length; i++) {
+        console.log(csvHeader[i]);
+        if (csvHeader[i] == "Voltage%") {
+            console.log("matched")
+            return i;
+        }
+    }
+    return false;
+}
+
 function checklastcall(csvContent, dateCol) {
-    time = new Date(time.getTime());
+    time = new Date();
+    console.log("the time today is: " + time);
     var ErrorStations = []
     for (var i = 0; i < csvContent.length-1; i++) {
-        splitDateFormat = csvContent[i][dateCol - 1].split(" ");
+        splitDateFormat = csvContent[i][dateCol].split(" ");
         splitYearMonthDate = splitDateFormat[0].split("-");
         splitHourMinSec = splitDateFormat[1].split(":");
         if ((time.getFullYear() - splitYearMonthDate[0]) == 0) {
             if (((time.getMonth() + 1) - splitYearMonthDate[1]) == 0) {
-
                 if ((time.getDate() - splitYearMonthDate[2]) == 0) {
-                    if ((time.getHours() - splitHourMinSec[0]) == 0) {
+                    if ((time.getHours()- splitHourMinSec[0]) == 0) {
                         console.log("the miniutes are going to be: " + splitHourMinSec[1]);
                         console.log(time.getUTCMinutes());
                         console.log(time.getMinutes() - splitHourMinSec[1]);
@@ -376,6 +404,22 @@ function checklastcall(csvContent, dateCol) {
         }
     }
     return ErrorStations;
+}
+
+
+function checkVoltageLevel(dataheader,data) {
+    var voltCol = findVolCol(dataheader)
+    console.log("the volt column is: " + voltCol);
+    var ErrorStations = []
+    for (var i = 0; i < data.length - 1; i++) {
+        console.log(data[i]);
+        console.log(data[i][voltCol]);
+        if (data[i][voltCol] <= 25) {
+            ErrorStations.push(data[i]);
+        }
+    }
+    return ErrorStations;
+
 }
 
 function filterPM(){
@@ -417,7 +461,8 @@ function callServerPM(filterTime){
     			"min=" + filterTime.getUTCMinutes() + "&" + 
     			"sec=" + filterTime.getUTCSeconds();
     FilterType = "PM"		
-    xmlhttp.open("GET","http://localhost/serverFilterPM.php"+ req,true);
+    xmlhttp.open("GET", "http://localhost/serverFilterPM.php" + req, true);
+    VoltagePressed = false;
     xmlhttp.send();
 }	
 	  
@@ -651,7 +696,7 @@ function timer(){
 		
 		if(timerVal <= 0){
 			timerVal = timerInterval;
-			callServer();
+            getNow();
 		}
 	
 		document.getElementById('timer').innerHTML = timerVal;

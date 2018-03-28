@@ -27,7 +27,7 @@
 	
 	$result = mysqli_query($conn, $sql);
 	$resultCheck = mysqli_num_rows($result);
-	echo "StationName,Latitude,Longitude,Voltage %,Date\n";
+	echo "StationName,Latitude,Longitude,Voltage%,Date\n";
 	if ($resultCheck > 0) {
 	    while($row = mysqli_fetch_assoc($result)) {
 	        echo $row['StationName'] ."," . $row["Latitude"] . "," . $row["Longitude"] ."," . $row["Battery %"] . "," . $row["Date"] . "\n";

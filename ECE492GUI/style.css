@@ -95,6 +95,10 @@ thead.Transparent{
 #highlight {
     background: #ff6666;
 }
+
+#highlightVolt{
+    background: #ffd800;
+}
 .dropdown-content a:hover {background-color: #ddd}
 
 .show {display:block;}
