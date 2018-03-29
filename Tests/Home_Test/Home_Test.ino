@@ -38,6 +38,8 @@ void setup() {
     while(1);
   }
   fonaSerial->print("AT+CNMI=2,1\r\n");
+  //fona.enableNetworkTimeSync(true);
+  //fonaSerial->print("AT&W\r\n");
 }
 
 void ackSMS(char* PhoneNum){
@@ -52,7 +54,7 @@ void changefreqSMS(char* PhoneNum, int newinterval){
     fona.sendSMS(PhoneNum, txtmsg);
 }
 
-void extractSMS(char* smsBuffer, char* fonaNotificationBuffer, char* callerIDbuffer){      
+void extractSMS(char* smsBuffer, char* fonaNotificationBuffer, char* callerIDbuffer, char* date, char* smstime){      
   char* bufPtr = fonaNotificationBuffer;
   //if (fona.available()){
     int slot = 0;            
@@ -78,6 +80,8 @@ void extractSMS(char* smsBuffer, char* fonaNotificationBuffer, char* callerIDbuf
       if (! fona.getSMSSender(slot, callerIDbuffer, 31)) {
         //Serial.println("Didn't find SMS message in slot!");
       }
+      fona.getSMSDate(slot,date,9);
+      fona.getSMSTime(slot,smstime,14);
       //Serial.print(F("FROM: ")); Serial.println(callerIDbuffer);
 
         // Retrieve SMS value.
@@ -103,22 +107,31 @@ void loop() {
   char smsBuffer[80];
   char notifBuffer[64];
   char callerIDBuffer[32];
+  char date[9];
+  char smstime[14];
   //smsBuffer[0]='0'; 
   delay(1000);
   if (fona.available()){
     memset(smsBuffer, 0, sizeof(smsBuffer));
-    extractSMS(smsBuffer, notifBuffer, callerIDBuffer);
+    extractSMS(smsBuffer, notifBuffer, callerIDBuffer,date,smstime);
     //Send back a response
     if(smsBuffer[0]=='D'){
       //Serial.println("Received data, now sending ack...");
       ackSMS(callerIDBuffer);
-      File datafile = SD.open("mylog.csv", FILE_WRITE);
+      File datafile = SD.open("newlog.csv", FILE_WRITE);
       if (datafile){
-        datafile.println(smsBuffer);
+        datafile.print(callerIDBuffer);
+        datafile.print(",");
+        datafile.print(smsBuffer+2);
+        datafile.print(",");
+        datafile.print(date);
+        datafile.print(" ");
+        datafile.println(smstime);
         datafile.close();
-        //Serial.println(smsBuffer);
+        //Serial.println(smsBuffer+2);
       }
-     // Serial.println("?%s,%s!",callerIDBuffer,&smsBuffer[2]);
+     //Serial.print("?%s,%s!",callerIDBuffer,&smsBuffer[2]);
+     Serial.print(smsBuffer+2);
     }
   }
 }   

@@ -2,9 +2,9 @@
  * Created by: Ken Hidalgo
  * Code for testing the remote station using SMS
 */
-//#include "DHT.h"
+#include "DHT.h"
 #include "Adafruit_FONA.h"
-//#include "SMPWM01A.h"
+#include "SMPWM01A.h"
 #include <avr/sleep.h>
 
 
@@ -13,8 +13,9 @@
 #define FONA_RST 4
 
 // Constants
-//#define DHTPIN 8     // Temp & Humid Sensor
-//#define DHTTYPE DHT22   // DHT 22 signal pin
+#define RI_PIN 12
+#define DHTPIN 8     // Temp & Humid Sensor
+#define DHTTYPE DHT22   // DHT 22 signal pin
 //#define HOME_PHONE "+17808500725" //Ken's Cell Phone Number
 #define HOME_PHONE "+17806166416"
 #define PINNUMBER "" //SIM card PIN number
@@ -26,12 +27,13 @@ SoftwareSerial *fonaSerial = &fonaSS;
 
 Adafruit_FONA fona = Adafruit_FONA(FONA_RST);
 
-//DHT dht(DHTPIN, DHTTYPE); // Instantiate dht
-//SMPWM01A dust;
+DHT dht(DHTPIN, DHTTYPE); // Instantiate dht
+SMPWM01A dust;
 
-volatile int interval = 1; // Interval in mins
+volatile int interval = 3; // Interval in mins
 volatile int sleep_total = (interval*60)/8; // 
 volatile int sleep_count = 0;
+int stateRI = HIGH;
 
 void setup() {
   watchdogOn();
@@ -40,7 +42,7 @@ void setup() {
     ; // wait for serial port to connect. Needed for native USB port only
   }
 
-  //dust.begin();
+  dust.begin();
   
   fonaSerial->begin(4800);
   if (! fona.begin(*fonaSerial)) {
@@ -49,16 +51,18 @@ void setup() {
   }
 
   fonaSerial->print("AT+CNMI=2,1\r\n");
-  //fona.enableGPS(true);
+  fona.enableGPS(true);
   while(fona.available()){}
 }
 
 void sendSMS(char* Phone){
    //floating point variables to hold sensor values
-    /*float hum;  //Stores humidity value
+    float hum;  //Stores humidity value
     float temp; //Stores temperature value
     float dust2; 
     float dust10;
+    float lat;
+    float lon;
     uint16_t batt; 
   
     //character buffers for each value
@@ -66,6 +70,8 @@ void sendSMS(char* Phone){
     char t[11];
     char d2[11];
     char d10[11];
+    char lt[11];
+    char ln[11];
     char b[11];
   
     //Update sensor values here
@@ -74,18 +80,23 @@ void sendSMS(char* Phone){
     dust2 = dust.getPM2();
     dust10 = dust.getPM10();
     fona.getBattPercent(&batt);
-    
+    if(!(fona.getGSMLoc(&lat, &lon))){//If no GPS signal default to University location
+      lat = 53.5232;
+      lon = -113.5263;
+    }
     //convert floating point values to strings
     dtostrf(hum, 10, 4, h);
     dtostrf(temp, 10, 4, t);
     dtostrf(dust2, 10, 4, d2);
     dtostrf(dust10, 10, 4, d10);
-    dtostrf(batt, 10, 4, b);*/
+    dtostrf(lat, 10, 4, lt);
+    dtostrf(lon, 10, 4, ln);
+    dtostrf(batt, 10, 4, b);
     
-    char txtmsg[80];
+    char txtmsg[100];
     //Package and Send
-    //snprintf(txtmsg, sizeof(txtmsg), "D,%s,%s,%s,%s,%s", t,h,d2,d10,b);
-    snprintf(txtmsg, sizeof(txtmsg), "D,50, -100, 25, 50, 50, 26.5, 80");
+    snprintf(txtmsg, sizeof(txtmsg), "D,%s,%s,%s,%s,%s,%s,%s",t,h,d2,d10,lt,ln,b);
+    //snprintf(txtmsg, sizeof(txtmsg), "D,50,-100,25,50,50,26.5,80");
     fona.sendSMS(Phone, txtmsg);
 }
 
@@ -180,8 +191,10 @@ void loop() {
 
 void goToSleep()   {
   set_sleep_mode(SLEEP_MODE_PWR_DOWN); // Set sleep mode.
+  PCMSK0 |= (1<<PCINT4);
   sleep_enable(); // Enable sleep mode.
   sleep_mode(); // Enter sleep mode.
+  PCMSK0 |= ~(1<<PCINT4);
   sleep_disable(); // Disable sleep mode after waking.
 }
 
@@ -195,4 +208,19 @@ void watchdogOn() {
 
 ISR(WDT_vect){
   sleep_count ++; 
+}
+
+//http://www.fiz-ix.com/2012/11/low-power-arduino-using-the-watchdog-timer/
+
+ISR(PCINT0_vect) {
+ if (stateRI != digitalRead(RI_PIN)){ 
+   if ((stateRI = digitalRead(RI_PIN)) == LOW){
+    sleep_disable();
+    PCMSK0 |= ~(1<<PCINT4);
+    sleep_count = sleep_total;
+    }
+ } 
+ else{
+  dust.PCINT2_ISR();
+ }
 }

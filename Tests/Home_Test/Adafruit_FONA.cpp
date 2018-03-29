@@ -561,6 +561,58 @@ boolean Adafruit_FONA::getSMSSender(uint8_t i, char *sender, int senderlen) {
   return result;
 }
 
+boolean Adafruit_FONA::getSMSDate(uint8_t i, char *date, int datelen) {
+  // Ensure text mode and all text mode parameters are sent.
+  if (! sendCheckReply(F("AT+CMGF=1"), ok_reply)) return false;
+  if (! sendCheckReply(F("AT+CSDH=1"), ok_reply)) return false;
+
+
+  DEBUG_PRINT(F("AT+CMGR="));
+  DEBUG_PRINTLN(i);
+
+
+  // Send command to retrieve SMS message and parse a line of response.
+  mySerial->print(F("AT+CMGR="));
+  mySerial->println(i);
+  readline(1000);
+
+
+  DEBUG_PRINTLN(replybuffer);
+
+
+  // Parse the second field in the response.
+  boolean result = parseReplyQuoted(F("+CMGR:"), date, datelen, ',', 3);
+  // Drop any remaining data from the response.
+  flushInput();
+  return result;
+}
+
+boolean Adafruit_FONA::getSMSTime(uint8_t i, char *smstime, int timelen) {
+  // Ensure text mode and all text mode parameters are sent.
+  if (! sendCheckReply(F("AT+CMGF=1"), ok_reply)) return false;
+  if (! sendCheckReply(F("AT+CSDH=1"), ok_reply)) return false;
+
+
+  DEBUG_PRINT(F("AT+CMGR="));
+  DEBUG_PRINTLN(i);
+
+
+  // Send command to retrieve SMS message and parse a line of response.
+  mySerial->print(F("AT+CMGR="));
+  mySerial->println(i);
+  readline(1000);
+
+
+  DEBUG_PRINTLN(replybuffer);
+
+
+  // Parse the second field in the response.
+  boolean result = parseReplyQuoted(F("+CMGR:"), smstime, timelen, ',', 4);
+  // Drop any remaining data from the response.
+  flushInput();
+  return result;
+}
+
 boolean Adafruit_FONA::sendSMS(char *smsaddr, char *smsmsg) {
   if (! sendCheckReply(F("AT+CMGF=1"), ok_reply)) return false;
 
