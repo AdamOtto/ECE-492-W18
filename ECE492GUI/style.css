@@ -118,3 +118,6 @@ thead.Transparent{
 .mapHead {
 	background-color:transparent
 }
+div.bottomElement{
+padding-bottom: 100px;
+}
