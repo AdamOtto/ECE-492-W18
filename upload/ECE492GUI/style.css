@@ -8,15 +8,6 @@
 	height: 300px;
 }
 
-.sticky {
-  position: fixed;  
-  top: 0;
-}
-
-.sticky + .body {
-  padding-top: 102px;
-}
-
 .temp_pic {
 	width: 150px;
 	height:250px;
@@ -34,10 +25,12 @@ table {
 }
  
 tr:nth-child(even) {
-  background: #d4d4d4;
+  background: rgba(212, 212, 212, 0.8)
+  /*background: #d4d4d4;*/
 }
 tr:nth-child(odd) {
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.8)
+  /*background: #ffffff;*/
 }
 th, td {
   padding: 10px 30px;
@@ -45,6 +38,14 @@ th, td {
  
 th {
   border-bottom: 1px solid #d4d4d4;
+}
+
+tr.TransparentRows{
+	background: rgba(255, 255, 255, 0.0)
+}
+
+thead.Transparent{
+	background: rgba(255, 255, 255, 0.0)
 }
 
 .dropbtn {

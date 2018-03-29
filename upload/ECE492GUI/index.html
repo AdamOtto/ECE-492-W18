@@ -85,10 +85,40 @@
 						<button id="prevButton" onclick="getPrevDate()">-10 minutes</button>
 					</td>
 					<td>
-						<form method="post" action="/">
-							<input type="number" id="numMinutes" name="pollPeriod"> </input>
+						<form method="post" action="/" id="freqChange">
+							<input type="number" min="0" max="3600" id="pollPeriod"> </input>
 							<input type="submit" value="Reset Polling Frequency (Minute)"></button>
 						</form>
+						<form method="post" action="/" id="addStation">
+							<input type="text" id="stationName" maxlength=20> </input>
+							<input type="number" id="stationPhone" maxlength=20> </input>
+							<input type="submit" value="Add Station"></button>
+						</form>
+						<form method="post" action="/" id="delStation">
+							<input type="text" id="stationName" maxlength=20> </input>
+							<input type="number" id="stationPhone" maxlength=20> </input>
+							<input type="submit" value="Delete Station"></button>
+						</form>
+						<script src="/socket.io/socket.io.js"></script>
+						<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+						<script>
+							$(function () {
+								var socket = io();
+								$('#freqChange').submit(function(){
+									socket.emit($('#freqChange').attr('id'), $('#freqChange input[id=pollPeriod]').val());
+									return false;
+								});
+								$('#addStation').submit(function(){
+									socket.emit($('#addStation').attr('id'), $('#addStation input[id=stationName]').val() + ',' + $('#addStation input[id=stationPhone]').val());
+									return false;
+								});
+								$('#delStation').submit(function(){
+									socket.emit($('#delStation').attr('id'), $('#delStation input[id=stationName]').val() + ',' + $('#delStation input[id=stationPhone]').val());
+									return false;
+								});
+							});
+						
+						</script>
 					</td>
 				</tr>
 			</table>

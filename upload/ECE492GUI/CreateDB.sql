@@ -57,3 +57,9 @@ INSERT INTO `remotestation`(`StationName`, `Latitude`, `Longitude`, `Temperature
 INSERT INTO `remotestation`(`StationName`, `Latitude`, `Longitude`, `Temperature`, `Dust 10`, `Dust 2.5`, `Humidity`, `Battery %`, `Date`) VALUES ("Station4",40,-120,15,50,100,100,100,"2018-02-11 8:04:56");
 INSERT INTO `remotestation`(`StationName`, `Latitude`, `Longitude`, `Temperature`, `Dust 10`, `Dust 2.5`, `Humidity`, `Battery %`, `Date`) VALUES ("Station5",60,-130,5,50,100,100,100,"2018-02-11 8:04:56");
 
+CREATE TABLE IF NOT EXISTS `ECE492Database`.`stationdata`(
+  `StationName` VARCHAR(20) NOT NULL,
+  `PhoneNumber` VARCHAR(20) NOT NULL UNIQUE,
+  PRIMARY KEY (`StationName`)
+)
+ENGINE = InnoDB;
