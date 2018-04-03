@@ -77,6 +77,7 @@
 			<table>
 				<tr>
 					<td>
+						<!--<button id="nextIndexButton" onclick="getNextIndex()"> < </button>-->
 						<button id="nextButton" onclick="getNextDate()">+10 minutes</button>
 					</td>
 					<td>
@@ -85,7 +86,15 @@
 					</td>
 					<td>
 						<button id="prevButton" onclick="getPrevDate()">-10 minutes</button>
+						<!--button id="prevIndexButton" onclick="getprevIndex()"> > </button>-->
 					</td>
+				</tr>
+				<tr>
+					<td></td>
+					<td align="center">
+						<input type="text" id="timeskip" onchange="timeSkipFunc()"> </input> time skip amount
+					</td>
+					<td></td>
 				</tr>
 			</table>
 		</div>
