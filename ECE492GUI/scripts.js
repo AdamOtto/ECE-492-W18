@@ -20,11 +20,14 @@ var dateCol;
 var voltCol;
 var map;
 var time;
+var slideShowStartTime;
+var slideShowEndTime;
 var timeskipamount = 10.0;
 var FilterType = "ShowAll";
 const timerInterval = 60;
 var timerVal = timerInterval;
 var timerEnabled = true;
+var slideShowEnabled = false;
 var GetNowPressed = false;
 var infoWindowContent;
 
@@ -32,9 +35,16 @@ function init(){
 	console.log("init started...");
 
 	time = new Date();
-	time = new Date(time.setHours(time.getHours() - 6));
-	console.log(time);
+	slideShowEndTime = time = new Date(time.setHours(time.getHours() - 6));
+	slideShowStartTime = new Date();
+	slideShowStartTime = new Date(slideShowStartTime.setHours(time.getHours() - 24));
+	
+	//console.log(slideShowStartTime);
+	//console.log(slideShowEndTime);
+	
 	document.getElementById('textDate').value =  time.toISOString().slice(0, 19).replace('T', ' ');
+	document.getElementById('slideShowStart').value =  slideShowStartTime.toISOString().slice(0, 19).replace('T', ' ');
+	document.getElementById('slideShowEnd').value =  slideShowEndTime.toISOString().slice(0, 19).replace('T', ' ');
 	document.getElementById('timeskip').value = timeskipamount;
 	
 	initMap();
@@ -752,18 +762,33 @@ function timer(){
 	
 		document.getElementById('timer').innerHTML = timerVal;
 	}
+	
+	if(slideShowEnabled){
+		
+		if(time >= slideShowEndTime){
+			time = slideShowStartTime;
+			document.getElementById('textDate').value =  time.toISOString().slice(0, 19).replace('T', ' ');
+		}
+		else {
+			time = new Date(parseDateString( document.getElementById('textDate').value).valueOf() + (timeskipamount * 60000));
+			document.getElementById('textDate').value = time.toISOString().slice(0, 19).replace('T', ' ');
+		}
+		callServerTime(time,FilterType);
+	}
 }
 
 function pauseTimer()
 {
-	if(timerEnabled){
-		timerEnabled = false;
-		document.getElementById('timerPause').innerHTML = "Start";
-	}
-	else
-	{
-		timerEnabled = true;
-		document.getElementById('timerPause').innerHTML = "Pause";
+	if (!slideShowEnabled){
+		if(timerEnabled){
+			timerEnabled = false;
+			document.getElementById('timerPause').innerHTML = "Start";
+		}
+		else
+		{
+			timerEnabled = true;
+			document.getElementById('timerPause').innerHTML = "Pause";
+		}
 	}
 }
 
@@ -788,4 +813,30 @@ function timeSkipFunc(){
 	}
 	else
 		document.getElementById('timeskip').value = timeskipamount;
+}
+
+function slideShowStartChange(){
+	slideShowStartTime = parseDateString(document.getElementById('slideShowStart').value)
+	//console.log(slideShowStartTime);
+}
+
+function slideShowEndChange(){
+	slideShowEndTime = parseDateString(document.getElementById('slideShowEnd').value)
+	//console.log(slideShowEndTime);
+}
+
+function StartSlideShow(){
+	if (slideShowEnabled) {
+		slideShowEnabled = false;
+		document.getElementById('slideShowButton').innerHTML = "Start";
+	}
+	else{
+		slideShowEnabled = true;
+		document.getElementById('slideShowButton').innerHTML = "Stop";
+		timerEnabled = false;
+		document.getElementById('timerPause').innerHTML = "Start";
+		
+		time = slideShowStartTime;
+		document.getElementById('textDate').value =  time.toISOString().slice(0, 19).replace('T', ' ');
+	}
 }
