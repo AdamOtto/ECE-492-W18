@@ -20,6 +20,11 @@ var dateCol;
 var voltCol;
 var map;
 var time;
+var tempPressed = false;
+var HumidPressed = false;
+var voltPressed = false;
+var PmPressed1 = false;
+var PmPressed2 = false;
 var slideShowStartTime;
 var slideShowEndTime;
 var timeskipamount = 10.0;
@@ -165,29 +170,139 @@ function initContent(header, body) {
 			htmlCode += body[row][rowCell];
 			htmlCode += '</td>';
 		}
+            //console.log("Adding marker " + row + ": Lat: " + latitude + ", Long: " + longitude);		
+            //console.log("the temperature is " + body[row][3]);
+            if (tempPressed == true) {
+                var tempcol = findTemplCol(csvHeader);
+                HumidPressed = false;
+                PmPressed = false;
+                voltPressed = false;
+                console.log("the tempcol is: " + tempcol);
+                temperature = parseInt(body[row][3]);
+                if (temperature <= 14) {
+                    markerColor = 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+                }
+                if ((22 > temperature) && (temperature > 14)) {
+                    markerColor = 'http://maps.google.com/mapfiles/ms/icons/ltblue-dot.png';
+                }
+                if ((26 > temperature) && (temperature > 22)) {
+                    markerColor = 'http://maps.google.com/mapfiles/ms/icons/green-dot.png';
+                }
+                if ((temperature > 26) && (temperature < 30)) {
+                    markerColor = 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png';
+                }
+                if ((temperature >= 30) && (temperature < 34)) {
+                    markerColor = 'http://maps.google.com/mapfiles/ms/icons/orange-dot.png';
+                }
+                if (temperature >= 34) {
+                    markerColor = 'http://maps.google.com/mapfiles/ms/icons/red-dot.png';
+                }
+            }
+             if (HumidPressed == true) {
+                 var humidCol = findHumidCol(csvHeader);
+                 tempPressed = false;
+                 voltPressed = false;
+                 PmPressed = false
+                console.log("the tempcol is: " + tempcol);
+                 var humididty = parseInt(body[row][humidCol]);
 
-		//console.log("Adding marker " + row + ": Lat: " + latitude + ", Long: " + longitude);		
-		//console.log("the temperature is " + body[row][3]);
-		temperature = parseInt(body[row][3]);
-		if(temperature <= -25){
-			markerColor ='http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
-		}
-		if( (-10 > temperature )&&( temperature > -20)){
-			markerColor = 'http://maps.google.com/mapfiles/ms/icons/ltblue-dot.png';
-		}
-		if(( 0 > temperature)&&(temperature > -10)){
-			markerColor = 'http://maps.google.com/mapfiles/ms/icons/green-dot.png';
-		}
-		if((temperature > 0) && ( temperature < 10)){
-			markerColor = 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png';
-		}		
-		if((temperature >= 10) && ( temperature < 20)){
-			markerColor = 'http://maps.google.com/mapfiles/ms/icons/orange-dot.png';
-		}		
-		if(temperature >= 20){
-			markerColor = 'http://maps.google.com/mapfiles/ms/icons/red-dot.png';
-		}
-		
+                 if (humididty <= 60) {
+                    markerColor = 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+                }
+                 if ((70 > humididty) && (humididty > 60)) {
+                    markerColor = 'http://maps.google.com/mapfiles/ms/icons/ltblue-dot.png';
+                }
+                 if ((80 > humididty) && (humididty > 70)) {
+                    markerColor = 'http://maps.google.com/mapfiles/ms/icons/green-dot.png';
+                }
+                 if ((humididty > 80) && (humididty < 90)) {
+                    markerColor = 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png';
+                }
+                 if ((humididty >= 90) && (humididty < 100)) {
+                    markerColor = 'http://maps.google.com/mapfiles/ms/icons/orange-dot.png';
+                }
+                 if (humididty >= 100) {
+                    markerColor = 'http://maps.google.com/mapfiles/ms/icons/red-dot.png';
+                }
+            }
+            if (voltPressed == true) {
+                 var voltCol = findVolCol(csvHeader);
+                tempPressed = false;
+                HumidPressed = false;
+                PmPressed = false;
+                console.log("the voltage column is: " + voltCol);
+                var voltage = parseInt(body[row][voltCol]);
+
+                if (voltage < 20) {
+                    markerColor = 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+                }
+                if ((40 > voltage) && (voltage >= 20)) {
+                    markerColor = 'http://maps.google.com/mapfiles/ms/icons/ltblue-dot.png';
+                }
+                if ((60 > voltage) && (voltage >= 40)) {
+                    markerColor = 'http://maps.google.com/mapfiles/ms/icons/green-dot.png';
+                }
+                if ((voltage >= 60) && (voltage < 80)) {
+                    markerColor = 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png';
+                }
+                if ((voltage >= 80) && (voltage < 100)) {
+                    markerColor = 'http://maps.google.com/mapfiles/ms/icons/orange-dot.png';
+                }
+                if (voltage >= 100) {
+                    markerColor = 'http://maps.google.com/mapfiles/ms/icons/red-dot.png';
+                }
+            }
+            if (PmPressed1 == true) {
+              var pmCol = findPMCol1(csvHeader);
+            tempPressed = false;
+            HumidPressed = false;
+            var pm = parseInt(body[row][pmCol]);
+
+            if (pm < 50) {
+                markerColor = 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+            }
+            if ((100 > pm) && (pm >= 50)) {
+                markerColor = 'http://maps.google.com/mapfiles/ms/icons/ltblue-dot.png';
+            }
+            if ((150 > pm) && (pm >= 100)) {
+                markerColor = 'http://maps.google.com/mapfiles/ms/icons/green-dot.png';
+            }
+            if ((pm >= 150) && (pm < 200)) {
+                markerColor = 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png';
+            }
+            if ((pm >= 200) && (pm < 300)) {
+                markerColor = 'http://maps.google.com/mapfiles/ms/icons/orange-dot.png';
+            }
+            if (pm >= 500) {
+                markerColor = 'http://maps.google.com/mapfiles/ms/icons/red-dot.png';
+            }
+         }
+            if (PmPressed2 == true) {
+                var pmCol = findPMCol2(csvHeader);
+                tempPressed = false;
+                HumidPressed = false;
+                 var pm = parseInt(body[row][pmCol]);
+
+                 if (pm < 50) {
+                    markerColor = 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+                }
+                 if ((100 > pm) && (pm >= 50)) {
+                    markerColor = 'http://maps.google.com/mapfiles/ms/icons/ltblue-dot.png';
+                }
+                 if ((150 > pm) && (pm >= 100)) {
+                    markerColor = 'http://maps.google.com/mapfiles/ms/icons/green-dot.png';
+                }
+                 if ((pm >= 150) && (pm < 200)) {
+                    markerColor = 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png';
+                }
+                 if ((pm >= 200) && (pm < 300)) {
+                    markerColor = 'http://maps.google.com/mapfiles/ms/icons/orange-dot.png';
+                }
+                 if (pm >= 500) {
+                    markerColor = 'http://maps.google.com/mapfiles/ms/icons/red-dot.png';
+                }
+               }
+
 			var pos = new google.maps.LatLng(latitude, longitude);
 			marker = new google.maps.Marker({
 			position:pos,
@@ -226,11 +341,15 @@ function clearMap() {
 
 function filterTemp(){
 	//console.log("inside filterTemp")
+	document.getElementById("image").innerHTML = 
+        "<img src =" + "'temp_scale.png'" +"alt = " + "temp scale" +"width=" + "'150px'" + "height=" + "'330px'" + "align=" + "right>";
+
 	time = new Date(time.getTime());
 	dt = time.toISOString().slice(0, 19).replace('T', ' ');
 	document.getElementById('textDate').value = dt;
 	callServerTemp(time);
-	
+    tempPressed = true;
+
 }
 
 
@@ -271,6 +390,10 @@ function filterVolt() {
     time = new Date(time.getTime());
     dt = time.toISOString().slice(0, 19).replace('T', ' ');
     document.getElementById('textDate').value = dt;
+
+    document.getElementById("image").innerHTML =
+        "<img src =" + "'voltage_scale.png'" + "alt = " + "temp scale" + "width=" + "'150px'" + "height=" + "'330px'" + "align=" + "right>";
+    voltPressed = true;
     callServerVolt(time)
 }
 
@@ -306,9 +429,12 @@ function callServerVolt(filterTime) {
 
 function filterHumid() {
     //console.log("inside filterHumid")
+    document.getElementById("image").innerHTML =
+        "<img src =" + "'humi_scale.png'" + "alt = " + "temp scale" + "width=" + "'150px'" + "height=" + "'330px'" + "align=" + "right>";
     time = new Date(time.getTime());
     dt = time.toISOString().slice(0, 19).replace('T', ' ');
     document.getElementById('textDate').value = dt;
+    HumidPressed = true;
     callServerHumid(time)
 }
 
@@ -356,6 +482,52 @@ function findVolCol(csvHeader) {
     for (var i = 0; i < csvHeader.length; i++) {
         //console.log(csvHeader[i]);
         if (csvHeader[i] == "Voltage%") {
+            console.log("matched")
+            return i;
+        }
+    }
+    return false;
+}
+
+function findTemplCol(csvHeader) {
+    //console.log("inside findVolVol");
+    for (var i = 0; i < csvHeader.length; i++) {
+        //console.log(csvHeader[i]);
+        if (csvHeader[i] == "Temperature") {
+            console.log("matched")
+            return i;
+        }
+    }
+    return false;
+}
+function findHumidCol(csvHeader) {
+    //console.log("inside findVolVol");
+    for (var i = 0; i < csvHeader.length; i++) {
+        //console.log(csvHeader[i]);
+        if (csvHeader[i] == "Humidity") {
+            console.log("matched")
+            return i;
+        }
+    }
+    return false;
+}
+
+function findPMCol1(csvHeader) {
+    //console.log("inside findVolVol");
+    for (var i = 0; i < csvHeader.length; i++) {
+        //console.log(csvHeader[i]);
+        if (csvHeader[i] == "Dust10") {
+            console.log("matched")
+            return i;
+        }
+    }
+    return false;
+}
+function findPMCol2(csvHeader) {
+    //console.log("inside findVolVol");
+    for (var i = 0; i < csvHeader.length; i++) {
+        //console.log(csvHeader[i]);
+        if (csvHeader[i] == "Dust2.5") {
             console.log("matched")
             return i;
         }
@@ -435,8 +607,21 @@ function filterPM(){
 	//console.log("inside filterPM")
 	time = new Date(time.getTime());
 	dt = time.toISOString().slice(0, 19).replace('T', ' ');
-	document.getElementById('textDate').value = dt;
+    document.getElementById('textDate').value = dt;
+    document.getElementById("image").innerHTML =
+        "<img src =" + "'PM_scale.png'" + "alt = " + "temp scale" + "width=" + "'150px'" + "height=" + "'330px'" + "align=" + "right>";
+    PmPressed1 = true;
 	callServerPM(time);
+}
+function filterPM2() {
+	//console.log("inside filterPM")
+	time = new Date(time.getTime());
+	dt = time.toISOString().slice(0, 19).replace('T', ' ');
+    document.getElementById('textDate').value = dt;
+    document.getElementById("image").innerHTML =
+        "<img src =" + "'PM_scale.png'" + "alt = " + "temp scale" + "width=" + "'150px'" + "height=" + "'330px'" + "align=" + "right>";
+    PmPressed2 = true;
+	callServerPM2(time);
 }
 
 function filterShowAll() {
@@ -470,7 +655,34 @@ function callServerPM(filterTime){
     			"min=" + filterTime.getUTCMinutes() + "&" + 
     			"sec=" + filterTime.getUTCSeconds();
     FilterType = "PM"		
-    xmlhttp.open("GET", "http://localhost/serverFilterPM.php" + req, true);
+    xmlhttp.open("GET", "http://localhost/serverFilterPM1.php" + req, true);
+    VoltagePressed = false;
+    xmlhttp.send();
+}
+
+function callServerPM2(filterTime) {
+	//console.log("inside callServerPM")
+		if (window.XMLHttpRequest) {
+            // code for IE7+, Firefox, Chrome, Opera, Safari
+            xmlhttp = new XMLHttpRequest({mozSystem: true});
+    } else {
+        // code for IE6, IE5
+        xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    xmlhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            parseData(this.responseText);
+            initContent(csvHeader, csvContent);
+        }
+    };
+	var  req ="?year=" + filterTime.getFullYear() + "&" +
+				"month=" + (filterTime.getMonth() + 1) + "&" +
+    			"day=" + filterTime.getDate() + "&" +
+    			"hour=" + filterTime.getUTCHours() + "&" +
+    			"min=" + filterTime.getUTCMinutes() + "&" + 
+    			"sec=" + filterTime.getUTCSeconds();
+    FilterType = "PM"		
+    xmlhttp.open("GET", "http://localhost/serverFilterPM2.php" + req, true);
     VoltagePressed = false;
     xmlhttp.send();
 }	
@@ -542,6 +754,18 @@ function createInforWindowContentVoltaged(data) {
             '<p>Latitude: ' + data[i][1] + '</p>' +
             '<p>Longitude: ' + data[i][2] + '</p>' +
             '<p>Voltage: ' + data[i][3] + '</p>' +
+            '<p>Date: ' + data[i][4] + '</p>']);
+    }
+    return infoWindow;
+}
+
+function createInforWindowContentPM(data) {
+    var infoWindow = [];
+    for (var i = 0; i < data.length; i++) {
+        infoWindow.push(['<h1>' + data[i][0] + '</h1>' +
+            '<p>Latitude: ' + data[i][1] + '</p>' +
+            '<p>Longitude: ' + data[i][2] + '</p>' +
+            '<p>Dust 1.0: ' + data[i][3] + '</p>' +
             '<p>Date: ' + data[i][4] + '</p>']);
     }
     return infoWindow;
