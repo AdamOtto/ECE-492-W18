@@ -43,7 +43,7 @@ void SMPWM01A::begin() {
   // set up Timer 1
   TCCR1A = 0;          							// normal operation
   TCCR1B = (1<<WGM12)|(1<<CS10)|(1<<CS12);   	// CTC, scale to clock / 1024
-  OCR1A  = 62500;       						// compare A register value (62500 * clock speed / 1024)
+  OCR1A  = 62500*7.5;       						// compare A register value (62500 * clock speed / 1024)
   TIMSK1 = 1<<OCIE1A;             				// interrupt on Compare A Match
 
   // Enable pin change interrupt
@@ -65,10 +65,10 @@ void SMPWM01A::begin() {
 
 
 
-//ISR(PCINT0_vect) {
- //SMPWM01A::PCINT2_ISR();
+ISR(PCINT0_vect) {
+ SMPWM01A::PCINT2_ISR();
   
-//} 
+} 
 
 
 void SMPWM01A::PCINT2_ISR() {

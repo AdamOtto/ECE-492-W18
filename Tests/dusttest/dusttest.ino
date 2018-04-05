@@ -32,5 +32,5 @@ void loop() {
   Serial.println(d25);
   Serial.print("Large Particulate Concentration: ");
   Serial.println(d100);
-  delay(15000);
+  delay(30000);
 }

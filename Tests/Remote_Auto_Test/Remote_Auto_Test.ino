@@ -5,21 +5,17 @@
 #include "DHT.h"
 #include "Adafruit_FONA.h"
 #include "SMPWM01A.h"
-#include <avr/sleep.h>
-
 
 #define FONA_RX 2
 #define FONA_TX 3
 #define FONA_RST 4
 
 // Constants
-#define RI_PIN 12
 #define DHTPIN 8     // Temp & Humid Sensor
 #define DHTTYPE DHT22   // DHT 22 signal pin
-//#define HOME_PHONE "+17808500725" //Ken's Cell Phone Number
-#define HOME_PHONE "+17809944626"
+#define HOME_PHONE "+17808500725" //Ken's Cell Phone Number
+//#define HOME_PHONE "+17806166416"
 #define PINNUMBER "" //SIM card PIN number
-#define MAXTRIES 2
 
 #include "SoftwareSerial.h"
 SoftwareSerial fonaSS = SoftwareSerial(FONA_TX, FONA_RX);
@@ -30,13 +26,7 @@ Adafruit_FONA fona = Adafruit_FONA(FONA_RST);
 DHT dht(DHTPIN, DHTTYPE); // Instantiate dht
 SMPWM01A dust;
 
-volatile int interval = 1; // Interval in mins
-volatile int sleep_total = (interval*60)/8; // 
-volatile int sleep_count = 0;
-int stateRI = HIGH;
-
 void setup() {
-  watchdogOn();
   Serial.begin(115200);
   while (!Serial) {
     ; // wait for serial port to connect. Needed for native USB port only
@@ -51,7 +41,7 @@ void setup() {
   }
 
   fonaSerial->print("AT+CNMI=2,1\r\n");
-  fona.enableGPS(true);
+  //fona.enableGPS(true);
   while(fona.available()){}
 }
 
@@ -61,17 +51,14 @@ void sendSMS(char* Phone){
     float temp; //Stores temperature value
     float dust2; 
     float dust10;
-    float lat;
-    float lon;
     uint16_t batt; 
   
     //character buffers for each value
     char h[11];
     char t[11];
+    char txtmsg[80];
     char d2[11];
     char d10[11];
-    char lt[11];
-    char ln[11];
     char b[11];
   
     //Update sensor values here
@@ -80,23 +67,17 @@ void sendSMS(char* Phone){
     dust2 = dust.getPM2();
     dust10 = dust.getPM10();
     fona.getBattPercent(&batt);
-    if(!(fona.getGSMLoc(&lat, &lon))){//If no GPS signal default to University location
-      lat = 53.5232;
-      lon = -113.5263;
-    }
+    
     //convert floating point values to strings
     dtostrf(hum, 10, 4, h);
     dtostrf(temp, 10, 4, t);
     dtostrf(dust2, 10, 4, d2);
     dtostrf(dust10, 10, 4, d10);
-    dtostrf(lat, 10, 4, lt);
-    dtostrf(lon, 10, 4, ln);
     dtostrf(batt, 10, 4, b);
-    
-    char txtmsg[100];
+  
     //Package and Send
-    snprintf(txtmsg, sizeof(txtmsg), "D,%s,%s,%s,%s,%s,%s,%s",lt,ln,t,d10,d2,h,b);
-    //snprintf(txtmsg, sizeof(txtmsg), "D,50,-100,25,50,50,26.5,80");
+    snprintf(txtmsg, sizeof(txtmsg), "D,%s,%s,%s,%s,%s", t,h,d2,d10,b);
+    //snprintf(txtmsg, sizeof(txtmsg), "25, 16");
     fona.sendSMS(Phone, txtmsg);
 }
 
@@ -148,79 +129,23 @@ void extractSMS(char* smsBuffer, char* fonaNotificationBuffer){
 }
 
 void loop() {
-  goToSleep();
-  if (sleep_count >= sleep_total){
-    sleep_count = 0;
-    char smsBuffer[250];
-    char notifBuffer[64];
-    bool AckRec = false;
-    int trycount = 0;
-    sendSMS(HOME_PHONE);
-    memset(smsBuffer, NULL, sizeof(smsBuffer));
-    while(fona.available()){ //Check for delay changes
-        extractSMS(smsBuffer, notifBuffer);
-        if (smsBuffer[0]=='T'){
-          interval = atoi(&smsBuffer[2]);
-          sleep_total = (interval*60)/8;
-          Serial.print("New interval: ");
-          Serial.println(interval);
-        }
+  char smsBuffer[250];
+  char notifBuffer[64];
+  bool AckRec = false;
+  sendSMS(HOME_PHONE);
+  memset(smsBuffer, 0, sizeof(smsBuffer));
+  while(!(AckRec)){
+    delay(30000);
+    while(fona.available()){
+      extractSMS(smsBuffer, notifBuffer);
+      if (smsBuffer[0]=='A'){
+        AckRec = true;
+        Serial.print("Ack Received");
       }
-    while((!(AckRec))&&(trycount<MAXTRIES)){
-      delay(30000);
-      memset(smsBuffer, NULL, sizeof(smsBuffer));
-      while(fona.available()){
-        extractSMS(smsBuffer, notifBuffer);
-        if (smsBuffer[0]=='A'){
-          AckRec = true;
-          Serial.print("Ack Received");
-        }else if (smsBuffer[0]=='T'){
-          interval = atoi(&smsBuffer[2]);
-          sleep_total = (interval*60)/8;
-          Serial.print("New interval: ");
-          Serial.println(interval);
-        }
-      }
-      if (!(AckRec)){//Timed out without receiving an ack
-        sendSMS(HOME_PHONE);
-      }
-      trycount+=1;
+    }
+    if (!(AckRec)){//Timed out without receiving an ack
+      sendSMS(HOME_PHONE);
     }
   }
-}
-
-void goToSleep()   {
-  set_sleep_mode(SLEEP_MODE_PWR_DOWN); // Set sleep mode.
-  PCMSK0 |= (1<<PCINT4);
-  sleep_enable(); // Enable sleep mode.
-  sleep_mode(); // Enter sleep mode.
-  PCMSK0 |= ~(1<<PCINT4);
-  sleep_disable(); // Disable sleep mode after waking.
-}
-
-void watchdogOn() { 
-  MCUSR = MCUSR & B11110111;
-  WDTCSR = WDTCSR | B00011000; 
-  WDTCSR = B00100001;
-  WDTCSR = WDTCSR | B01000000;
-  MCUSR = MCUSR & B11110111;
-}
-
-ISR(WDT_vect){
-  sleep_count ++; 
-}
-
-//http://www.fiz-ix.com/2012/11/low-power-arduino-using-the-watchdog-timer/
-
-ISR(PCINT0_vect) {
- if (stateRI != digitalRead(RI_PIN)){ 
-   if ((stateRI = digitalRead(RI_PIN)) == LOW){
-    sleep_disable();
-    PCMSK0 |= ~(1<<PCINT4);
-    sleep_count = sleep_total;
-    }
- } 
- else{
-  dust.PCINT2_ISR();
- }
+  delay(60000);
 }

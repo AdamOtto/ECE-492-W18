@@ -16,8 +16,7 @@
 #define P2 10
 #define P1 9
 #define FILTER_WEIGHT 2.0 //set to 1.0 for no filtering
-//#define SAMPLE_MS 4000ul
-#define SAMPLE_MS 30000ul
+#define SAMPLE_MS 4000ul
 
 class SMPWM01A {
     public:

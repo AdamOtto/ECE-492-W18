@@ -40,6 +40,7 @@ void setup() {
   fonaSerial->print("AT+CNMI=2,1\r\n");
   //fona.enableNetworkTimeSync(true);
   //fonaSerial->print("AT&W\r\n");
+  fileDump();
 }
 
 void ackSMS(char* PhoneNum){
@@ -100,7 +101,6 @@ void extractSMS(char* smsBuffer, char* fonaNotificationBuffer, char* callerIDbuf
         fona.print(F("AT+CMGD=?\r\n"));
       }
     }
-  //}
 }
 
 void loop() {
@@ -131,7 +131,30 @@ void loop() {
         //Serial.println(smsBuffer+2);
       }
      //Serial.print("?%s,%s!",callerIDBuffer,&smsBuffer[2]);
+     Serial.print("?");
+     Serial.print(callerIDBuffer);
+     Serial.print(",");
      Serial.print(smsBuffer+2);
+     Serial.print(",");
+     Serial.print(date);
+     Serial.print(" ");
+     Serial.println(smstime);
+     Serial.print("!");
+     Serial.println("\n");
     }
   }
 }   
+
+void fileDump(){
+  File datafile = SD.open("newlog.csv", FILE_READ);
+  String buffer;
+   if (datafile) {
+    while (datafile.available()) {
+      Serial.print("?");
+      buffer = datafile.readStringUntil('\n');
+      Serial.print(buffer);
+      Serial.println("!");
+    }
+    datafile.close();
+  }
+}

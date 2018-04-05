@@ -17,7 +17,7 @@
 #define DHTPIN 8     // Temp & Humid Sensor
 #define DHTTYPE DHT22   // DHT 22 signal pin
 //#define HOME_PHONE "+17808500725" //Ken's Cell Phone Number
-#define HOME_PHONE "+17806166416"
+#define HOME_PHONE "+17809944626"
 #define PINNUMBER "" //SIM card PIN number
 #define MAXTRIES 2
 
@@ -30,7 +30,7 @@ Adafruit_FONA fona = Adafruit_FONA(FONA_RST);
 DHT dht(DHTPIN, DHTTYPE); // Instantiate dht
 SMPWM01A dust;
 
-volatile int interval = 3; // Interval in mins
+volatile int interval = 1; // Interval in mins
 volatile int sleep_total = (interval*60)/8; // 
 volatile int sleep_count = 0;
 int stateRI = HIGH;
@@ -95,7 +95,7 @@ void sendSMS(char* Phone){
     
     char txtmsg[100];
     //Package and Send
-    snprintf(txtmsg, sizeof(txtmsg), "D,%s,%s,%s,%s,%s,%s,%s",t,h,d2,d10,lt,ln,b);
+    snprintf(txtmsg, sizeof(txtmsg), "D,%s,%s,%s,%s,%s,%s,%s",lt,ln,t,d10,d2,h,b);
     //snprintf(txtmsg, sizeof(txtmsg), "D,50,-100,25,50,50,26.5,80");
     fona.sendSMS(Phone, txtmsg);
 }
