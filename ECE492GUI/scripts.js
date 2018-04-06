@@ -627,9 +627,13 @@ function filterPM2() {
 function filterShowAll() {
     //console.log("inside filterShowAll")
     time = new Date(time.getTime());
+    document.getElementById("image").innerHTML =
+        "<img src =" + "'temp_scale.png'" + "alt = " + "temp scale" + "width=" + "'150px'" + "height=" + "'330px'" + "align=" + "right>";
     dt = time.toISOString().slice(0, 19).replace('T', ' ');
     document.getElementById('textDate').value = dt;
     FilterType = "ShowAll"
+    tempPressed = true;
+
     callServerTime(time,FilterType);
 }
 	  
