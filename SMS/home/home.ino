@@ -118,7 +118,7 @@ void loop() {
     if(smsBuffer[0]=='D'){
       //Serial.println("Received data, now sending ack...");
       ackSMS(callerIDBuffer);
-      File datafile = SD.open("newlog.csv", FILE_WRITE);
+      File datafile = SD.open("somelog.csv", FILE_WRITE);
       if (datafile){
         datafile.print(callerIDBuffer);
         datafile.print(",");
@@ -135,10 +135,10 @@ void loop() {
      Serial.print(callerIDBuffer);
      Serial.print(",");
      Serial.print(smsBuffer+2);
-     Serial.print(",");
+     /*Serial.print(",");
      Serial.print(date);
      Serial.print(" ");
-     Serial.println(smstime);
+     Serial.print(smstime);*/
      Serial.print("!");
      Serial.println("\n");
     }
@@ -146,7 +146,7 @@ void loop() {
 }   
 
 void fileDump(){
-  File datafile = SD.open("newlog.csv", FILE_READ);
+  File datafile = SD.open("somelog.csv", FILE_READ);
   String buffer;
    if (datafile) {
     while (datafile.available()) {
