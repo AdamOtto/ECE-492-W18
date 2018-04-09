@@ -47,7 +47,7 @@
 	mysqli_select_db($conn, "id5126683_ece492database");
 	$sql =  $type . "
 	FROM remotestation as r
-	WHERE r.Date = (SELECT MAX(Date) from remotestation as r2 where r2.StationName = r.StationName AND r2.Date < " . $q . ")
+	WHERE r.Date = (SELECT MAX(Date) from remotestation as r2 where r2.StationName = r.StationName AND r2.Date <= " . $q . ")
 	ORDER by r.StationName ASC;";
 	//echo ($sql);
 	$result = mysqli_query($conn, $sql);

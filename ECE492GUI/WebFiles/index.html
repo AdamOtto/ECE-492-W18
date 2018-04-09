@@ -1,0 +1,109 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <link rel="stylesheet" type="text/css" href="style.css">
+        <title>New Web Project</title>
+    </head>
+    <body onload="init()" class="bodyBack">
+    	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    	
+        <h1 align="center">Base Station GUI</h1>
+		<div class = "dropdown">
+
+		<!--
+		<button onclick = "myFunction()" class ="dropbtn"> Dropdown </button>
+		<div id = "myDropdown" class = "dropdown-content">
+			<a onclick = "filterTemp()"> Temperature </a>
+			<a onclick = "filterHumid()"> Humidity </a>
+			<a onclick = "filterPM()"> Particulate Matter </a>
+            <a onclick = "filterVolt()"> Voltage</a>
+			<a onclick = "filterShowAll()"> Show all </a>
+				</div>
+		</div>
+		-->
+        <script src="scripts.js"></script>
+        
+        <table>
+        	<thead>
+        		<tr class="TransparentRows">
+	        		<th></th>
+	        		<th align="right">
+	        			<button onclick = "myFunction()" class ="dropbtn"> Filter Options </button>
+						<div id = "myDropdown" class = "dropdown-content" align="right">
+							<a onclick = "filterTemp()"> Temperature </a>
+							<a onclick = "filterHumid()"> Humidity </a>
+							<a onclick = "filterPM()"> Dust10 </a>
+							<a onclick = "filterPM2()"> Dust2.5 </a>
+				            <a onclick = "filterVolt()"> Voltage</a>
+							<a onclick = "filterShowAll()"> Show all </a>
+						</div>
+	        		</th>
+        		</tr>
+        	</thead>
+        	<tbody>
+        	<tr class="TransparentRows">
+        		<td width="1600px" height="450px">
+        			<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB1-4XWM8LnJMhGsl4XIvcSyrU_pacYTxc" type="text/javascript"></script>
+			        <div id="googleMap" class="map"></div>
+        		</td>
+        		<td width="300px" height="450px">
+        			<div id = "image">
+        			</div>
+        		</td>
+        	</tr>
+        	</tbody>
+        </table>
+        <div align="center">
+        	<table>
+        		<tbody>
+        		<tr><td>Time until Automatic update. <button id='timerPause' onclick="pauseTimer()">Pause</button></td></tr>
+        		<tr><td id="timer" align="center"></td></tr>
+        		</tbody>
+        	</table>
+        </div>
+        
+        <div id="content" align="center"></div>
+		<div align="center" class="bottomElement">
+			<table>
+				<tr>
+					<td>
+						<!--<button id="nextIndexButton" onclick="getNextIndex()"> < </button>-->
+						<button id="nextButton" onclick="getNextDate()">+10 minutes</button>
+					</td>
+					<td>
+						<input type="text" id="textDate"> </input>
+						<button id="getButton" onclick="getNow()"><- get this time</button>
+					</td>
+					<td>
+						<button id="prevButton" onclick="getPrevDate()">-10 minutes</button>
+						<!--button id="prevIndexButton" onclick="getprevIndex()"> > </button>-->
+					</td>
+				</tr>
+				<tr>
+					<td></td>
+					<td align="center">
+						<input type="text" id="timeskip" onchange="timeSkipFunc()"> </input> time skip amount
+					</td>
+					<td><div>Time skip is also used to determine</div><div>the speed of the slide show.</div></td>
+				</tr>
+				<tr>
+					<td>Slide show mode</td>
+					<td align="center">
+						<div>
+							<input type="text" id="slideShowStart" onchange="slideShowStartChange()"> </input> Slide show start
+						</div>
+						<div>
+							<input type="text" id="slideShowEnd" onchange="slideShowEndChange()"> </input> Slide show end
+						</div>
+					</td>
+					<td>
+						<button id="slideShowButton" onclick="StartSlideShow()">Start</button>
+					</td>
+				</tr>
+			</table>
+		</div>
+
+    </body>
+</html>
