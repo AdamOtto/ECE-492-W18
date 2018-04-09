@@ -70,8 +70,8 @@ void sendSMS(char* Phone){
     char t[11];
     char d2[11];
     char d10[11];
-    char lt[11];
-    char ln[11];
+    char lt[15];
+    char ln[15];
     char b[11];
   
     //Update sensor values here
@@ -81,17 +81,17 @@ void sendSMS(char* Phone){
     dust10 = dust.getPM10();
     fona.getBattPercent(&batt);
     if(!(fona.getGSMLoc(&lat, &lon))){//If no GPS signal default to University location
-      lat = 53.5232;
-      lon = -113.5263;
+      lat = 53.523219;
+      lon = -113.526319;
     }
     //convert floating point values to strings
-    dtostrf(hum, 10, 4, h);
-    dtostrf(temp, 10, 4, t);
+    dtostrf(hum, 10, 1, h);
+    dtostrf(temp, 10, 1, t);
     dtostrf(dust2, 10, 4, d2);
     dtostrf(dust10, 10, 4, d10);
-    dtostrf(lat, 10, 4, lt);
-    dtostrf(lon, 10, 4, ln);
-    dtostrf(batt, 10, 4, b);
+    dtostrf(lat, 14, 6, lt);
+    dtostrf(lon, 14, 6, ln);
+    dtostrf(batt, 10, 0, b);
     
     char txtmsg[100];
     //Package and Send

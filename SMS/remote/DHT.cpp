@@ -57,7 +57,7 @@ float DHT::readTemperature(bool S, bool force) {
       break;
     }
   }
-  return f;
+  return f-3;
 }
 
 float DHT::convertCtoF(float c) {

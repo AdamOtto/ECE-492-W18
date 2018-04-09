@@ -14,6 +14,10 @@
 #define PINNUMBER "" //SIM card PIN number
 #define CHIPSELECT 10
 
+const char phonebook[][12] = {"17809944628", "17809944630"};
+//const char phonebook[][12] = {"17808500725"};
+const int num_stations = 2;
+
 #include <SoftwareSerial.h>
 SoftwareSerial fonaSS = SoftwareSerial(FONA_TX, FONA_RX);
 SoftwareSerial *fonaSerial = &fonaSS;
@@ -44,14 +48,12 @@ void setup() {
 }
 
 void ackSMS(char* PhoneNum){
-    char txtmsg[80];
-    snprintf(txtmsg, sizeof(txtmsg), "A");
-    fona.sendSMS(PhoneNum, txtmsg);
+    /*char txtmsg[80];
+    snprintf(txtmsg, sizeof(txtmsg), "A");*/
+    fona.sendSMS(PhoneNum, "A");
 }
 
-void changefreqSMS(char* PhoneNum, int newinterval){
-    char txtmsg[80];
-    snprintf(txtmsg, sizeof(txtmsg), "T,%d", newinterval);
+void changefreqSMS(char* PhoneNum, char* txtmsg){
     fona.sendSMS(PhoneNum, txtmsg);
 }
 
@@ -82,12 +84,13 @@ void extractSMS(char* smsBuffer, char* fonaNotificationBuffer, char* callerIDbuf
         //Serial.println("Didn't find SMS message in slot!");
       }
       fona.getSMSDate(slot,date,9);
-      fona.getSMSTime(slot,smstime,14);
+      fona.getSMSTime(slot,smstime,12);
+      memset(smstime+8, 0, 3);
       //Serial.print(F("FROM: ")); Serial.println(callerIDbuffer);
 
         // Retrieve SMS value.
         uint16_t smslen;
-        if (fona.readSMS(slot, smsBuffer, 80, &smslen)) { // pass in buffer and max len!
+        if (fona.readSMS(slot, smsBuffer, 100, &smslen)) { // pass in buffer and max len!
           //Serial.println("SMS stored");
         }
         
@@ -104,11 +107,11 @@ void extractSMS(char* smsBuffer, char* fonaNotificationBuffer, char* callerIDbuf
 }
 
 void loop() {
-  char smsBuffer[80];
+  char smsBuffer[100];
   char notifBuffer[64];
   char callerIDBuffer[32];
   char date[9];
-  char smstime[14];
+  char smstime[12];
   //smsBuffer[0]='0'; 
   delay(1000);
   if (fona.available()){
@@ -132,15 +135,29 @@ void loop() {
       }
      //Serial.print("?%s,%s!",callerIDBuffer,&smsBuffer[2]);
      Serial.print("?");
-     Serial.print(callerIDBuffer);
+     Serial.print(callerIDBuffer+1);
      Serial.print(",");
      Serial.print(smsBuffer+2);
-     /*Serial.print(",");
+     Serial.print(",");
+     Serial.print("\"");
      Serial.print(date);
      Serial.print(" ");
-     Serial.print(smstime);*/
+     Serial.print(smstime);
+     Serial.print("\"");
      Serial.print("!");
      Serial.println("\n");
+    }
+  }
+  if(Serial.available()){
+    String buffer;
+    buffer = Serial.readStringUntil('\n');
+    if (buffer[0]=='T'){
+      int i;
+      char arr[buffer.length()+1];
+      buffer.toCharArray(arr, buffer.length()+1);
+      for (i=0; i<num_stations; i++){
+        changefreqSMS(phonebook[i], arr); 
+      }
     }
   }
 }   
