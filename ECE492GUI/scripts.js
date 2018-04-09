@@ -1,16 +1,6 @@
 /**
  * @author adamo
  */
-/*
-$(document).ready(function() {
-	$.ajax({	
-		type: "GET",	
-		url: "test.csv",
-		dataType: "text",	
-		success: function(data) {csvFunction(data);}	
-	});
-});
-*/
 var csvData;
 var csvHeader = [];
 var csvContent = [];
@@ -35,7 +25,14 @@ var timerEnabled = true;
 var slideShowEnabled = false;
 var GetNowPressed = false;
 var infoWindowContent;
+var markers =  [];
 
+/**
+ * init()
+ * 
+ * An "on load" function that preps the webpage.
+ * Sets the time in the filter and initializes the google map.
+ */
 function init(){
 	console.log("init started...");
 
@@ -62,26 +59,31 @@ function init(){
 	console.log("init end.");
 }
 
+/**
+ * initMap
+ * 
+ * A function that sets up the google map.  Centers the map on Edmonton. 
+ */
 function initMap() {
 	var center = new google.maps.LatLng(53.5444,-113.4909);
 	var mapProp= {
 	    center:new google.maps.LatLng(53.5444,-113.4909),
 	    zoom:5,
 	    gestureHandling: 'greedy'
-	};
-	//var marker = new google.maps.Marker({position:center});
-	
+	};	
 	map = new google.maps.Map(document.getElementById("googleMap"),mapProp);
-	
-	//marker.setMap(map);
 }
 
 /**
- * Reloads the table with data from the csv file based on the passed in value.
+ * initContent()
  * 
- * Takes in the headers of the table and the rows, or the body, of the table as arguments.
+ * Generates the HTML code that will display the current table.
+ * Also creates and sets the markers on the google map.
+ * 
+ * input:
+ * 		header: an array containing the elements of the table header.
+ * 		body: a 2D array containing the elements for each row.
  */
- var markers =  [];
 function initContent(header, body) {
 	//Code help from -> https://code.tutsplus.com/tutorials/parsing-a-csv-file-with-javascript--cms-25626
 	console.log("initContent started...");
@@ -170,8 +172,6 @@ function initContent(header, body) {
 			htmlCode += body[row][rowCell];
 			htmlCode += '</td>';
 		}
-            //console.log("Adding marker " + row + ": Lat: " + latitude + ", Long: " + longitude);		
-            //console.log("the temperature is " + body[row][3]);
             if (tempPressed == true) {
                 var tempcol = findTemplCol(csvHeader);
                 HumidPressed = false;
@@ -311,13 +311,9 @@ function initContent(header, body) {
 			title:'hello'
 			});
 			markers.push(marker);
-			//console.log(row);
 			google.maps.event.addListener(marker,'click',(function(marker,row){
 				return function(){
-                    //console.log('setting the content to this' + row + infoWindowContent[row][0]);
-                    //console.log("before this stuff: " + infoWindowContent);
                     infoWindow.setContent(infoWindowContent[row][0]);
-                    //console.log("the content is: " + infoWindowContent[row][0]);
 					infoWindow.open(map,marker);
 				}
 			})(marker,row));
@@ -547,40 +543,24 @@ function checklastcall(csvContent, dateCol) {
             if (((time.getMonth() + 1) - splitYearMonthDate[1]) == 0) {
                 if ((time.getDate() - splitYearMonthDate[2]) == 0) {
                     if ((time.getHours()- splitHourMinSec[0]) == 0) {
-                        //console.log("the miniutes are going to be: " + splitHourMinSec[1]);
-                        //console.log(time.getUTCMinutes());
-                        //console.log(time.getMinutes() - splitHourMinSec[1]);
-                        if ((time.getMinutes() - splitHourMinSec[1]) <= 10) {
-                            //console.log("inside here and the statointhat passed is: " + csvContent[i]);
-                        }
+                        if ((time.getMinutes() - splitHourMinSec[1]) <= 10) {}
                         else {
-                            //console.log("Error at station miniutes:" + csvContent[i][0]);
-                            //console.log(splitHourMinSec[1]);
-                            //console.log(time.getUTCMinutes());
                             ErrorStations.push(csvContent[i]);
                         }
                     }
                     else {
-                        //console.log("Error at station Hours :" + csvContent[i][0]);
-                        //console.log(splitHourMinSec[0]);
-                        //console.log(time.getHours());
                         ErrorStations.push(csvContent[i]);
                     }
                 }
                 else {
-                    //console.log("Error at station :" + csvContent[i][0]);
                     ErrorStations.push(csvContent[i]);
-
                 }
             }   
             else {
-                //console.log("Error at station :" + csvContent[i][0]);
                 ErrorStations.push(csvContent[i]);
-
             }
         }
         else {
-            //console.log("Error at station :" + csvContent[i][0]);
             ErrorStations.push(csvContent[i]);
         }
     }
@@ -613,6 +593,7 @@ function filterPM(){
     PmPressed1 = true;
 	callServerPM(time);
 }
+
 function filterPM2() {
 	//console.log("inside filterPM")
 	time = new Date(time.getTime());
@@ -625,7 +606,6 @@ function filterPM2() {
 }
 
 function filterShowAll() {
-    //console.log("inside filterShowAll")
     time = new Date(time.getTime());
     document.getElementById("image").innerHTML =
         "<img src =" + "'temp_scale.png'" + "alt = " + "temp scale" + "width=" + "'150px'" + "height=" + "'330px'" + "align=" + "right>";
@@ -695,10 +675,16 @@ function deleteMarkers(){
 	clearMap();
 }
 
+/**
+ *parseData
+ * input:
+ *		data: a newline sperated list of the to-be-built table.
+ * output:
+ * 		global csvHeader: contains the header of the table.
+ * 		global csvContent: contains the rows of the table.
+ */
 function parseData(data)
 {
-	//var d1 = new Date(2017, 7, 24, 14, 52, 10);
-	//var d2 = Date.parse("2018 Feb 13 2:34:55");
 	var allRows = data.split(/\r?\n|\r/);
 	csvHeader = [];
 	csvContent = [];
@@ -709,14 +695,6 @@ function parseData(data)
 		else
 			csvContent[row - 1] = rowCells;
 	}
-	//console.log(csvHeader);
-	//console.log(csvContent);
-}
-
-function csvFunction(data)
-{
-	//console.log(data);
-	csvData = data;
 }
 
 function createContentString(station_number,temp,humididty,pmatter){
@@ -805,12 +783,6 @@ function createInfoWindowContent(data){
 	return infoWindow;
 }
 
-
-function myFunction() {
-	//console.log("hello inside myFunction");
-    document.getElementById("myDropdown").classList.toggle("show");
-}
-
 window.onclick = function(event) {
   if (!event.target.matches('.dropbtn')) {
 
@@ -825,6 +797,12 @@ window.onclick = function(event) {
   }
 }
 
+/**
+ * callServer()
+ * 
+ * Calls the server to return the most recent data-set of each remote station.
+ * Once the asynchronous call has returned, update the table with the new data.
+ */
 function callServer() {
 	
 	if (window.XMLHttpRequest) {
@@ -846,6 +824,16 @@ function callServer() {
     xmlhttp.send();
 }
 
+/**
+ * callServerTime
+ * 
+ * Calls the server, including a filter for the most recent call up to a certain date and time.
+ * Once the asynchronous call has returned, update the table with the new data.
+ * 
+ * inputs:
+ * 		filterTime: The time we'd like the server to filter by.
+ * 		FilterType: Determines what elements the server will return.
+ */
 function callServerTime(filterTime,FilterType){
 	if (window.XMLHttpRequest) {
             // code for IE7+, Firefox, Chrome, Opera, Safari
@@ -861,7 +849,6 @@ function callServerTime(filterTime,FilterType){
             initContent(csvHeader, csvContent);
         }
     };
-    //console.log("FILTER TYPE IS : " + FilterType)
     var req = "?year=" + filterTime.getFullYear() + "&" +
         "month=" + (filterTime.getMonth() + 1) + "&" +
         "day=" + filterTime.getDate() + "&" +
@@ -869,42 +856,15 @@ function callServerTime(filterTime,FilterType){
         "min=" + filterTime.getUTCMinutes() + "&" +
         "sec=" + filterTime.getUTCSeconds() + "&" +
         "filtertype=" + FilterType;
-    //console.log("inside callServerTime")
-    //console.log(req)
     xmlhttp.open("GET","http://localhost/DateFilter.php" + req,true);
     xmlhttp.send();
 }
 
-/*
-function callServerPrevIndex(filterTime, filterName){
-	
-	if (window.XMLHttpRequest) {
-            // code for IE7+, Firefox, Chrome, Opera, Safari
-            xmlhttp = new XMLHttpRequest({mozSystem: true});
-    } else {
-        // code for IE6, IE5
-        xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-    }
-    xmlhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-        	//buffer[buffer.length] = this.responseText;
-            console.log(this.responseText);
-        }
-    };
-    
-    var req = "?year=" + filterTime.getFullYear() + "&" +
-        "month=" + (filterTime.getMonth() + 1) + "&" +
-        "day=" + filterTime.getDate() + "&" +
-        "hour=" + filterTime.getUTCHours() + "&" +
-        "min=" + filterTime.getUTCMinutes() + "&" +
-        "sec=" + filterTime.getUTCSeconds() + "&" +
-        "name=" + filterName;
-    xmlhttp.timeout = 4000;
-    xmlhttp.open("GET","http://localhost/serverPrevIndex.php" + req,true);
-    xmlhttp.send();
-}
-*/
-
+/**
+ * getNow()
+ * 
+ * Function for the "<- get this time" button.  Makes sure that the input date is valid before making the request.
+ */
 function getNow(){
     timestamp = Date.parse(document.getElementById('textDate').value);
     GetNowPressed = true;
@@ -922,6 +882,11 @@ function getNow(){
 	}
 }
 
+/**
+ * getPrevDate()
+ * 
+ * Function for the "-10 minutes" button.  Decreases the filter time then calls the server.
+ */
 function getPrevDate()
 {   
     GetNowPressed = false;
@@ -932,6 +897,11 @@ function getPrevDate()
 	callServerTime(time,FilterType);	
 }
 
+/**
+ * getNextDate()
+ * 
+ * Function for the "-10 minutes" button.  Increases the filter time then calls the server.
+ */
 function getNextDate()
 {
     GetNowPressed = false;
@@ -942,31 +912,14 @@ function getNextDate()
     callServerTime(time, FilterType);	
 }
 
-/*
-function getNextIndex(){
-	
-}
-
-function getprevIndex(){
-	buffer = [];
-	for ( i = 0; i < csvContent.length - 1; i++)
-	{
-		//console.log(csvContent[i][0]);
-		//console.log(csvContent[i][csvContent[i].length - 1]);		
-		callServerPrevIndex( parseDateString(csvContent[i][csvContent[i].length - 1]), csvContent[i][0]);
-	}
-}
-
-function sortFunc(a, b)
-{
-	if (a[0] === b[0]) {
-        return 0;
-    }
-    else {
-        return (a[0] < b[0]) ? -1 : 1;
-    }
-}
-*/
+/**
+ * parseDateString()
+ * 
+ * A function that takes a date string and converts it to a Date object.
+ * 
+ * input:
+ * 		datestr: A string representing a datetime
+ */
 function parseDateString(datestr){
 	var newTime = new Date();
 	newTime.setFullYear( datestr.substring(0,4) );
@@ -979,6 +932,11 @@ function parseDateString(datestr){
 	return newTime;
 }
 
+/**
+ * timer()
+ * 
+ * A function that is executed every second.  Is used for the automatic updates as well as the slide show. 
+ */
 function timer(){
 	if(timerEnabled){
 		timerVal -= 1;
@@ -1005,6 +963,11 @@ function timer(){
 	}
 }
 
+/**
+ * pauseTimer()
+ *  
+ * Pauses and un-pauses the automatic timer countdown.
+ */
 function pauseTimer()
 {
 	if (!slideShowEnabled){
@@ -1020,6 +983,12 @@ function pauseTimer()
 	}
 }
 
+
+/**
+ * timeSkipFunc()
+ * 
+ * Function used for an on-change event when altering the timeskip text field. 
+ */
 function timeSkipFunc(){
 	var temp = parseFloat(document.getElementById('timeskip').value);
 	if(temp != NaN)
@@ -1043,16 +1012,32 @@ function timeSkipFunc(){
 		document.getElementById('timeskip').value = timeskipamount;
 }
 
+/**
+ * slideShowStartChange()
+ * 
+ * Function used for an on-change event when altering the slide show start time text field. 
+ */
 function slideShowStartChange(){
 	slideShowStartTime = parseDateString(document.getElementById('slideShowStart').value)
 	//console.log(slideShowStartTime);
 }
 
+/**
+ * slideShowStartChange()
+ * 
+ * Function used for an on-change event when altering the slide show end time text field. 
+ */
 function slideShowEndChange(){
 	slideShowEndTime = parseDateString(document.getElementById('slideShowEnd').value)
 	//console.log(slideShowEndTime);
 }
 
+/**
+ * StartSlideShow()
+ * 
+ * The function for the "start slideshow" button.
+ * Pauses the automatic update timer and enables the slide show for the timer function.
+ */
 function StartSlideShow(){
 	if (slideShowEnabled) {
 		slideShowEnabled = false;
