@@ -39,23 +39,15 @@ function init(){
 	time = new Date();
 	slideShowEndTime = time = new Date(time.setHours(time.getHours() - 6));
 	slideShowStartTime = new Date();
-	slideShowStartTime = new Date(slideShowStartTime.setHours(time.getHours() - 24));
-	
-	//console.log(slideShowStartTime);
-	//console.log(slideShowEndTime);
-	
+	slideShowStartTime = new Date(slideShowStartTime.setHours(time.getHours() - 24));	
 	document.getElementById('textDate').value =  time.toISOString().slice(0, 19).replace('T', ' ');
 	document.getElementById('slideShowStart').value =  slideShowStartTime.toISOString().slice(0, 19).replace('T', ' ');
 	document.getElementById('slideShowEnd').value =  slideShowEndTime.toISOString().slice(0, 19).replace('T', ' ');
 	document.getElementById('timeskip').value = timeskipamount;
 	
 	initMap();
-	//parseData(csvData);
-	callServer();
-	//initContent(csvHeader, csvContent);
-	
-	setInterval(timer, 1000);
-	
+	callServer();	
+	setInterval(timer, 1000);	
 	console.log("init end.");
 }
 
@@ -91,28 +83,28 @@ function initContent(header, body) {
 	var hlat;
     var hlon;
     document.getElementById('content').innerHTML = "";
-    //console.log("the filter type is: " + FilterType);
 	
 
     if (FilterType == "Temp") {
         infoWindowContent = createInforWindowContentTemp(body);
     }
     if (FilterType == "HUMID") {
-        //console.log("inside this if for humid");
         infoWindowContent = createInforWindowContentHumid(body);
     }
-    if (FilterType == "PM") {
-        infoWindowContent = createInforWindowContentPM(body);
+    if (FilterType == "PM1") {
+        infoWindowContent = createInforWindowContentPM1(body);
     }
+    if (FilterType == "PM2") {
+        infoWindowContent = createInforWindowContentPM2(body);
+    }
+
     if (FilterType == "VOLT") {
         infoWindowContent = createInforWindowContentVoltaged(body);
     }
     if (FilterType == "ShowAll") {
-        //console.log("inside this else");
         infoWindowContent = createInfoWindowContent(body);
     }
 	var infoWindow = new google.maps.InfoWindow(),marker,row;
-	//console.log('The new infowindowcontent is ' + infoWindowContent);
 
 
 	htmlCode += '<thead><tr>'
@@ -141,20 +133,16 @@ function initContent(header, body) {
     }
 
 	for (var row = 0; row < body.length - 1; row++) {
-		//htmlCode += '<tr>';
 		var latitude = 0;
 		var longitude = 0;
 		var temperature = 0;
         var markerColor = 'http://maps.google.com/mapfiles/ms/icons/green-dot.png';
        
         if ((BadStations.includes(body[row]) == true) && (GetNowPressed == true)) {
-            //console.log("inside here");
-            //console.log(BadStations);
             htmlCode += '<tr id ="highlight">';
         }
    
         else if ((lowBatteryStations.includes(body[row]) == true) && (voltCol != true)) {
-            //console.log("inside this second if");
             htmlCode += '<tr id ="highlightVolt">';
         }
 
@@ -164,9 +152,9 @@ function initContent(header, body) {
 
         for (var rowCell = 0; rowCell < body[row].length; rowCell++) {
 			if(rowCell == hlat)
-				latitude = parseInt( body[row][rowCell] );
-			if(rowCell == hlon)
-                longitude = parseInt(body[row][rowCell]);
+				latitude = parseFloat( body[row][rowCell] );
+            if (rowCell == hlon)
+                longitude = parseFloat(body[row][rowCell]);
 
 			htmlCode += '<td>';
 			htmlCode += body[row][rowCell];
@@ -328,6 +316,10 @@ function initContent(header, body) {
 	console.log("initContent end.");
 }
 
+/**
+ * Function here clears the map when called, goes through the marker array and set them all to null
+ * 
+ */
 function clearMap() {
 	for (var i = 0; i < markers.length; i++) {
 		markers[i].setMap(null);
@@ -335,11 +327,14 @@ function clearMap() {
 	markers.length = 0;
 }
 
+/**
+ * Function here is called in the HTML page when we are filtering by Temp,
+ * when called it will look for the div id of "image" and replace that with a inner html <-- which will
+ * be the html code that will update the page with the the temperature scale. It will also get the current time too to pass to our filtering
+ */
 function filterTemp(){
-	//console.log("inside filterTemp")
 	document.getElementById("image").innerHTML = 
         "<img src =" + "'temp_scale.png'" +"alt = " + "temp scale" +"width=" + "'150px'" + "height=" + "'330px'" + "align=" + "right>";
-
 	time = new Date(time.getTime());
 	dt = time.toISOString().slice(0, 19).replace('T', ' ');
 	document.getElementById('textDate').value = dt;
@@ -347,14 +342,15 @@ function filterTemp(){
     tempPressed = true;
 
 }
-
+/**
+ * After filterTemp is called it will pass the current time and pass it to CallServerTemp, in which
+ * will store the current time in a var to pass onto our php file to filter the database to look
+ * specifically for Temperature
+ * @param {any} filterTime
+ */
 
 function callServerTemp(filterTime){
-	
-	//console.log("inside callserverTemp")
-	//console.log(filterTime) 
 	if (window.XMLHttpRequest) {
-            // code for IE7+, Firefox, Chrome, Opera, Safari
             xmlhttp = new XMLHttpRequest({mozSystem: true});
     } else {
         // code for IE6, IE5
@@ -373,16 +369,19 @@ function callServerTemp(filterTime){
     			"hour=" + filterTime.getUTCHours() + "&" +
     			"min=" + filterTime.getUTCMinutes() + "&" + 	
         		"sec=" + filterTime.getUTCSeconds();
-    FilterType = "Temp"
-    //console.log(req)
+    FilterType = "Temp";
     xmlhttp.open("GET","http://localhost/serverFilterTemp.php" + req, true);
     xmlhttp.send();
 	
 
 }
 
+/**
+ * Here this function is called from the HTML side when we are filtering by voltage in which again looking for the 
+ * div id = image it will replace the html with a img src which will be our voltage scale that is displayed
+ * at the same it will also get the current time to pass onto the filtering
+ */
 function filterVolt() {
-    //console.log("inside filterVolt")
     time = new Date(time.getTime());
     dt = time.toISOString().slice(0, 19).replace('T', ' ');
     document.getElementById('textDate').value = dt;
@@ -393,10 +392,15 @@ function filterVolt() {
     callServerVolt(time)
 }
 
+/**
+ * This is called by filterVolt in which takes in a parameter of the current time to pass onto our filtering
+ * pretty much we are storing the curr time in a varaible into our php file in which will do a sql query to grab the
+ * filtered column which is voltage and display it on the GUI
+ *
+ * @param {any} filterTime
+ */
 function callServerVolt(filterTime) {
-    //console.log("inside callServerVolt")
     if (window.XMLHttpRequest) {
-        // code for IE7+, Firefox, Chrome, Opera, Safari
         xmlhttp = new XMLHttpRequest({ mozSystem: true });
     } else {
         // code for IE6, IE5
@@ -408,23 +412,25 @@ function callServerVolt(filterTime) {
             initContent(csvHeader, csvContent);
         }
     };
-
-
     var req = "?year=" + filterTime.getFullYear() + "&" +
         "month=" + (filterTime.getMonth() + 1) + "&" +
         "day=" + filterTime.getDate() + "&" +
         "hour=" + filterTime.getUTCHours() + "&" +
         "min=" + filterTime.getUTCMinutes() + "&" +
         "sec=" + filterTime.getUTCSeconds();
-    FilterType = "VOLT"
+    FilterType = "VOLT";
     VoltagePressed = true;
-    //console.log(req)
     xmlhttp.open("GET", "http://localhost/serverFilterVolt.php" + req, true);
     xmlhttp.send();
 }
 
+
+/**
+ * Here this function is called from the HTML side when we are filtering by humiditiy in which again looking for the 
+ * div id = image it will replace the html with a img src which will be our humiditiy scale that is displayed
+ * at the same it will also get the current time to pass onto the filtering
+ */
 function filterHumid() {
-    //console.log("inside filterHumid")
     document.getElementById("image").innerHTML =
         "<img src =" + "'humi_scale.png'" + "alt = " + "temp scale" + "width=" + "'150px'" + "height=" + "'330px'" + "align=" + "right>";
     time = new Date(time.getTime());
@@ -434,8 +440,12 @@ function filterHumid() {
     callServerHumid(time)
 }
 
+/**
+ * Here this function is called when we click on filterHumid in which takes the parameter of time to pass onto our filtering in which
+ * storing it in a varaible we pass into php to filter by column which will be humididty and then output this onto our html
+ * @param {any} filterTime
+ */
 function callServerHumid(filterTime) {
-    //console.log("inside callServerHumid")
     if (window.XMLHttpRequest) {
         // code for IE7+, Firefox, Chrome, Opera, Safari
         xmlhttp = new XMLHttpRequest({ mozSystem: true });
@@ -455,16 +465,23 @@ function callServerHumid(filterTime) {
         "hour=" + filterTime.getUTCHours() + "&" +
         "min=" + filterTime.getUTCMinutes() + "&" +
         "sec=" + filterTime.getUTCSeconds();
-    FilterType = "HUMID"
-    //console.log(req)
+    FilterType = "HUMID";
     xmlhttp.open("GET", "http://localhost/serverHumid.php" + req, true);
     xmlhttp.send();
 }
 
 
+/**
+ * This function here will take teh data header [name,lat,long,temp... so on] and the content 
+ * of the data Rows  <--- actual data 
+ * and it will loop through the entire header to find the data column and return that column placement to the user 
+ * to which will be used when we are creating data to display for filtering 
+ * 
+ * @param {any} csvHeader
+ * @param {any} csvContent
+ */
 function findDateCol(csvHeader, csvContent) {
     for (var i = 0; i < csvHeader.length; i++) {
-        //console.log(csvHeader[i]);
         if (csvHeader[i] == "Date") {
             return i;
         }
@@ -472,11 +489,14 @@ function findDateCol(csvHeader, csvContent) {
     return i
 }
 
+/**
+ * Function that takes the header data from html side to find the column "Voltage%" to return
+ * to the user in which will be used when we are filtering 
+ * @param {any} csvHeader
+ */
 
 function findVolCol(csvHeader) {
-    //console.log("inside findVolVol");
     for (var i = 0; i < csvHeader.length; i++) {
-        //console.log(csvHeader[i]);
         if (csvHeader[i] == "Voltage%") {
             console.log("matched")
             return i;
@@ -485,10 +505,13 @@ function findVolCol(csvHeader) {
     return false;
 }
 
+/**
+ * Function that takes the header data from the html side to find the column "Temperature" to return
+ * to the user which will be used when we are creating markers for filtering
+ * @param {any} csvHeader
+ */
 function findTemplCol(csvHeader) {
-    //console.log("inside findVolVol");
     for (var i = 0; i < csvHeader.length; i++) {
-        //console.log(csvHeader[i]);
         if (csvHeader[i] == "Temperature") {
             console.log("matched")
             return i;
@@ -496,10 +519,13 @@ function findTemplCol(csvHeader) {
     }
     return false;
 }
+
+/**
+ * Function that takes the header data from html side and returns the column/placement of the column named "Humidity"
+ * @param {any} csvHeader
+ */
 function findHumidCol(csvHeader) {
-    //console.log("inside findVolVol");
     for (var i = 0; i < csvHeader.length; i++) {
-        //console.log(csvHeader[i]);
         if (csvHeader[i] == "Humidity") {
             console.log("matched")
             return i;
@@ -508,10 +534,12 @@ function findHumidCol(csvHeader) {
     return false;
 }
 
+/**
+ * Function that takes the header from html side and returns the column/placement of the column named "Dust10"
+ * @param {any} csvHeader
+ */
 function findPMCol1(csvHeader) {
-    //console.log("inside findVolVol");
     for (var i = 0; i < csvHeader.length; i++) {
-        //console.log(csvHeader[i]);
         if (csvHeader[i] == "Dust10") {
             console.log("matched")
             return i;
@@ -519,10 +547,13 @@ function findPMCol1(csvHeader) {
     }
     return false;
 }
+
+/**
+ * Function that takes the header from html side and returns the column/placement of the column named "Dust2.5"
+ * @param {any} csvHeader
+ */
 function findPMCol2(csvHeader) {
-    //console.log("inside findVolVol");
     for (var i = 0; i < csvHeader.length; i++) {
-        //console.log(csvHeader[i]);
         if (csvHeader[i] == "Dust2.5") {
             console.log("matched")
             return i;
@@ -531,12 +562,18 @@ function findPMCol2(csvHeader) {
     return false;
 }
 
+/**
+ * Takes in the column placement of the DATE from the html side and the data too and will iterate at each data at that index of the dateCol to compare the current
+ * time and the last call time, if the current time and last call time differs more then 10 mins then it means there was a error that has occured in which will return
+ * and array back to the html a list of all the stations that havent sent data within 10 mins or less
+ * @param {any} csvContent
+ * @param {any} dateCol
+ */
 function checklastcall(csvContent, dateCol) {
     time = new Date();
-    //console.log("the time today is: " + time);
     var ErrorStations = []
     for (var i = 0; i < csvContent.length-1; i++) {
-        splitDateFormat = csvContent[i][dateCol].split(" ");
+        splitDateFormat = csvContent[i][dateCol].split(" "); 
         splitYearMonthDate = splitDateFormat[0].split("-");
         splitHourMinSec = splitDateFormat[1].split(":");
         if ((time.getFullYear() - splitYearMonthDate[0]) == 0) {
@@ -568,9 +605,14 @@ function checklastcall(csvContent, dateCol) {
 }
 
 
+/**
+ * Takes in the voltage col and the data to compare the data of each row at the index of the voltage and check if the level is less then 25 
+ * which will then return a list of arrays of all the stations that are below 25
+ * @param {any} dataheader
+ * @param {any} data
+ */
 function checkVoltageLevel(dataheader,data) {
     var voltCol = findVolCol(dataheader)
-    //console.log("the volt column is: " + voltCol);
     var ErrorStations = []
     for (var i = 0; i < data.length - 1; i++) {
         //console.log(data[i]);
@@ -583,8 +625,11 @@ function checkVoltageLevel(dataheader,data) {
 
 }
 
+/**
+ * From the HTML side when we press on DUST1.0 when filtering the data it'll call this function and update the webpage with
+ * the PM scale and find the current time in which will then pass that information to the actual filtering
+ */
 function filterPM(){
-	//console.log("inside filterPM")
 	time = new Date(time.getTime());
 	dt = time.toISOString().slice(0, 19).replace('T', ' ');
     document.getElementById('textDate').value = dt;
@@ -594,8 +639,11 @@ function filterPM(){
 	callServerPM(time);
 }
 
+/**
+ * From the HTML side when we press on DUST2.5 when filtering the data it'll call this function and update the webpage with
+ * the PM scale and find the current time in which will then pass that information to the actual filtering
+ */
 function filterPM2() {
-	//console.log("inside filterPM")
 	time = new Date(time.getTime());
 	dt = time.toISOString().slice(0, 19).replace('T', ' ');
     document.getElementById('textDate').value = dt;
@@ -605,6 +653,10 @@ function filterPM2() {
 	callServerPM2(time);
 }
 
+/**
+ * From the HTML side when we press on show when filtering the data it'll call this function and update the webpage with
+ * the default Temperature scale and find the current time in which will then pass that information to the actual filtering
+ */
 function filterShowAll() {
     time = new Date(time.getTime());
     document.getElementById("image").innerHTML =
@@ -616,9 +668,14 @@ function filterShowAll() {
 
     callServerTime(time,FilterType);
 }
-	  
+
+
+/**
+ * Here this function is called when we click on filterPM1 in which takes the parameter of time to pass onto our filtering in which
+ * storing it in a varaible we pass into php to filter by column which will be dust1.0 and then output this onto our html
+ * @param {any} filterTime
+ */
 function callServerPM(filterTime){
-	//console.log("inside callServerPM")
 		if (window.XMLHttpRequest) {
             // code for IE7+, Firefox, Chrome, Opera, Safari
             xmlhttp = new XMLHttpRequest({mozSystem: true});
@@ -638,14 +695,18 @@ function callServerPM(filterTime){
     			"hour=" + filterTime.getUTCHours() + "&" +
     			"min=" + filterTime.getUTCMinutes() + "&" + 
     			"sec=" + filterTime.getUTCSeconds();
-    FilterType = "PM"		
+    FilterType = "PM1"		
     xmlhttp.open("GET", "http://localhost/serverFilterPM1.php" + req, true);
     VoltagePressed = false;
     xmlhttp.send();
 }
 
+/**
+ * Here this function is called when we click on dust2.5 in which takes the parameter of time to pass onto our filtering in which
+ * storing it in a varaible we pass into php to filter by column which will be dust2.5 and then output this onto our html
+ * @param {any} filterTime
+ */
 function callServerPM2(filterTime) {
-	//console.log("inside callServerPM")
 		if (window.XMLHttpRequest) {
             // code for IE7+, Firefox, Chrome, Opera, Safari
             xmlhttp = new XMLHttpRequest({mozSystem: true});
@@ -665,12 +726,13 @@ function callServerPM2(filterTime) {
     			"hour=" + filterTime.getUTCHours() + "&" +
     			"min=" + filterTime.getUTCMinutes() + "&" + 
     			"sec=" + filterTime.getUTCSeconds();
-    FilterType = "PM"		
+    FilterType = "PM2"		
     xmlhttp.open("GET", "http://localhost/serverFilterPM2.php" + req, true);
     VoltagePressed = false;
     xmlhttp.send();
 }	
-	  
+
+//Function that is called will just call clearMap and delete the markers on googlemaps	  
 function deleteMarkers(){
 	clearMap();
 }
@@ -697,15 +759,12 @@ function parseData(data)
 	}
 }
 
-function createContentString(station_number,temp,humididty,pmatter){
-	var contentString = '<h1 class= "contentstring"> REMOTE STATION' + station_number + '</h1>'+
-						'<p>Temperature: '+ temp + ' </p>'+
-						'<p>Humididty: '+ humididty + ' </p>' +
-                        '<p>Particulate matter: ' + pmatter + ' </p>';
-        
-	return contentString;
-}
 
+/**
+ * Takes in the data from the webserver and converts it into a readable data that will be displayed on the markers when the user clicks on the markers
+ * sepecfically temperature
+ * @param {any} data
+ */
 function createInforWindowContentTemp(data) {
     var infoWindow = [];
     for (var i = 0; i < data.length; i++) {
@@ -716,8 +775,14 @@ function createInforWindowContentTemp(data) {
             '<p>Date: ' + data[i][4] + '</p>']);
     }
     return infoWindow;
+}
 
-} function createInforWindowContentHumid(data) {
+/**
+ * Takes in the data from the webserver and converts it into a readable data that will be displayed on the markers when the user clicks on the markers
+ * sepecfically Humididity
+ * @param {any} data
+ */
+function createInforWindowContentHumid(data) {
     var infoWindow = [];
     for (var i = 0; i < data.length; i++) {
         infoWindow.push(['<h1>' + data[i][0] + '</h1>' +
@@ -729,6 +794,11 @@ function createInforWindowContentTemp(data) {
     return infoWindow;
 }
 
+/**
+ * Takes in the data from the webserver and converts it into a readable data that will be displayed on the markers when the user clicks on the markers
+ * sepecfically voltage
+ * @param {any} data
+ */
 function createInforWindowContentVoltaged(data) {
     var infoWindow = [];
     for (var i = 0; i < data.length; i++) {
@@ -741,7 +811,12 @@ function createInforWindowContentVoltaged(data) {
     return infoWindow;
 }
 
-function createInforWindowContentPM(data) {
+/**
+ * Takes in the data from the webserver and converts it into a readable data that will be displayed on the markers when the user clicks on the markers
+ * sepecfically for dust1.0
+ * @param {any} data
+ */
+function createInforWindowContentPM1(data) {
     var infoWindow = [];
     for (var i = 0; i < data.length; i++) {
         infoWindow.push(['<h1>' + data[i][0] + '</h1>' +
@@ -752,6 +827,24 @@ function createInforWindowContentPM(data) {
     }
     return infoWindow;
 }
+
+/**
+ * Takes in the data from the webserver and converts it into a readable data that will be displayed on the markers when the user clicks on the markers
+ * sepecfically dust2
+ * @param {any} data
+ */
+function createInforWindowContentPM2(data) {
+    var infoWindow = [];
+    for (var i = 0; i < data.length; i++) {
+        infoWindow.push(['<h1>' + data[i][0] + '</h1>' +
+            '<p>Latitude: ' + data[i][1] + '</p>' +
+            '<p>Longitude: ' + data[i][2] + '</p>' +
+            '<p>Dust 2.5: ' + data[i][3] + '</p>' +
+            '<p>Date: ' + data[i][4] + '</p>']);
+    }
+    return infoWindow;
+}
+
 
 function createInforWindowContentPM(data) {
     var infoWindow = [];
@@ -766,7 +859,11 @@ function createInforWindowContentPM(data) {
     return infoWindow;
 }
 
-
+/**
+ * Takes in the data from the webserver and converts it into a readable data that will be displayed on the markers when the user clicks on the markers
+ * sepecfically showAll
+ * @param {any} data
+ */
 function createInfoWindowContent(data){
 	var infoWindow = [];
 	for (var i = 0; i < data.length; i ++){
@@ -783,6 +880,10 @@ function createInfoWindowContent(data){
 	return infoWindow;
 }
 
+/**
+ * Function that will activate when the drop down button is pressed on the html side
+ * @param {any} event
+ */
 window.onclick = function(event) {
   if (!event.target.matches('.dropbtn')) {
 
@@ -796,6 +897,12 @@ window.onclick = function(event) {
     }
   }
 }
+
+/**
+ * Function that toggles the myDropdown button to show the list elements
+ */
+function myFunction() {
+ document.getElementById("myDropdown").classList.toggle("show");}
 
 /**
  * callServer()
