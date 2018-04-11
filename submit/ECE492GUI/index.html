@@ -27,27 +27,29 @@
         
         <table>
         	<thead>
-        		<th></th>
-        		<th align="right">
-        			<button onclick = "myFunction()" class ="dropbtn"> Dropdown </button>
-					<div id = "myDropdown" class = "dropdown-content" align="right">
-						<a onclick = "filterTemp()"> Temperature </a>
-						<a onclick = "filterHumid()"> Humidity </a>
-						<a onclick = "filterPM()"> Particulate Matter </a>
-			            <a onclick = "filterVolt()"> Voltage</a>
-						<a onclick = "filterShowAll()"> Show all </a>
-					</div>
-        		</th>
+        		<tr class="TransparentRows">
+	        		<th></th>
+	        		<th align="right">
+	        			<button onclick = "myFunction()" class ="dropbtn"> Filter Options </button>
+						<div id = "myDropdown" class = "dropdown-content" align="right">
+							<a onclick = "filterTemp()"> Temperature </a>
+							<a onclick = "filterHumid()"> Humidity </a>
+							<a onclick = "filterPM()"> Particulate Matter </a>
+				            <a onclick = "filterVolt()"> Voltage</a>
+							<a onclick = "filterShowAll()"> Show all </a>
+						</div>
+	        		</th>
+        		</tr>
         	</thead>
         	<tbody>
-        	<tr>
-        		<td width="1600px" height="330px">
+        	<tr class="TransparentRows">
+        		<td width="1600px" height="450px">
         			<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB1-4XWM8LnJMhGsl4XIvcSyrU_pacYTxc" type="text/javascript"></script>
 			        <div id="googleMap" class="map"></div>
         		</td>
-        		<td width="300px" height="330px">
+        		<td width="300px" height="450px">
         			<div>
-        				<img src ="temperature_scale.png" alt = "temp scale" width="150px" height="330px" align="right">
+        				<img src ="temp_scale.png" alt = "temp scale" width="150px" height="330px" align="right">
         			</div>
         		</td>
         	</tr>
@@ -71,10 +73,11 @@
         </div>
         
         <div id="content" align="center"></div>
-		<div align="center">
+		<div align="center" class="bottomElement">
 			<table>
 				<tr>
 					<td>
+						<!--<button id="nextIndexButton" onclick="getNextIndex()"> < </button>-->
 						<button id="nextButton" onclick="getNextDate()">+10 minutes</button>
 					</td>
 					<td>
@@ -83,45 +86,78 @@
 					</td>
 					<td>
 						<button id="prevButton" onclick="getPrevDate()">-10 minutes</button>
+						<!--button id="prevIndexButton" onclick="getprevIndex()"> > </button>-->
+					</td>
+				</tr>
+				<tr>
+					<td></td>
+					<td align="center">
+						<input type="text" id="timeskip" onchange="timeSkipFunc()"> </input> time skip amount
+					</td>
+					<td><div>Time skip is also used to determine</div><div>the speed of the slide show.</div></td>
+				</tr>
+				<tr>
+					<td>Slide show mode</td>
+					<td align="center">
+						<div>
+							<input type="text" id="slideShowStart" onchange="slideShowStartChange()"> </input> Slide show start
+						</div>
+						<div>
+							<input type="text" id="slideShowEnd" onchange="slideShowEndChange()"> </input> Slide show end
+						</div>
 					</td>
 					<td>
+						<button id="slideShowButton" onclick="StartSlideShow()">Start</button>
+					</td>
+				</tr>
+				<tr>
+					<td>
 						<form method="post" action="/" id="freqChange">
-							<input type="number" min="0" max="3600" id="pollPeriod"> </input>
+							<input type="number" min="0" max="1440" id="pollPeriod"> </input>
 							<input type="submit" value="Reset Polling Frequency (Minute)"></button>
 						</form>
+					</td>
+				</tr>
+				<tr>
+					<td>
 						<form method="post" action="/" id="addStation">
 							<input type="text" id="stationName" maxlength=20> </input>
 							<input type="number" id="stationPhone" maxlength=20> </input>
 							<input type="submit" value="Add Station"></button>
 						</form>
+					</td>
+				</tr>
+				<tr>
+					<td>
 						<form method="post" action="/" id="delStation">
 							<input type="text" id="stationName" maxlength=20> </input>
-							<input type="number" id="stationPhone" maxlength=20> </input>
 							<input type="submit" value="Delete Station"></button>
 						</form>
-						<script src="/socket.io/socket.io.js"></script>
-						<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
-						<script>
-							$(function () {
-								var socket = io();
-								$('#freqChange').submit(function(){
-									socket.emit($('#freqChange').attr('id'), $('#freqChange input[id=pollPeriod]').val());
-									return false;
-								});
-								$('#addStation').submit(function(){
-									socket.emit($('#addStation').attr('id'), $('#addStation input[id=stationName]').val() + ',' + $('#addStation input[id=stationPhone]').val());
-									return false;
-								});
-								$('#delStation').submit(function(){
-									socket.emit($('#delStation').attr('id'), $('#delStation input[id=stationName]').val() + ',' + $('#delStation input[id=stationPhone]').val());
-									return false;
-								});
-							});
-						
-						</script>
 					</td>
 				</tr>
 			</table>
+			<div align="center">
+				<script src="/socket.io/socket.io.js"></script>
+				<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+				<script>
+					$(function () {
+						var socket = io();
+						$('#freqChange').submit(function(){
+							socket.emit($('#freqChange').attr('id'), $('#freqChange input[id=pollPeriod]').val());
+							return false;
+						});
+						$('#addStation').submit(function(){
+							socket.emit($('#addStation').attr('id'), $('#addStation input[id=stationName]').val() + ',' + $('#addStation input[id=stationPhone]').val());
+							return false;
+						});
+						$('#delStation').submit(function(){
+							socket.emit($('#delStation').attr('id'), $('#delStation input[id=stationName]').val());
+							return false;
+						});
+					});
+				
+				</script>
+			</div>
 		</div>
 
     </body>

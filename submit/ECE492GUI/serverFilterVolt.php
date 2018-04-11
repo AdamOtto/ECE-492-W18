@@ -1,10 +1,9 @@
 <?php
 	header("Access-Control-Allow-Origin: *");
 	$servername = "localhost";
-	$username = "id5126683_rootuser";
-	$password = "groot";
-	$dbname = "id5126683_ece492database";
-
+	$username = "root";
+	$password = "";
+	$dbname = "ece492database";
 	/*$q = intval($_GET['q']);*/
 	// Create connection
 	$year = intval($_GET['year']);
@@ -20,18 +19,18 @@
 	if (!$conn) {
 	    die("Connection failed: " . mysqli_error($conn));
 	}
-	mysqli_select_db($conn, "id5126683_ece492database");
-	$sql ="SELECT StationName,Latitude,Longitude,Humidity,Date
+	mysqli_select_db($conn, "remotesensor");
+	$sql ="SELECT StationName,Latitude,Longitude,`Battery %`,Date
 	FROM remotestation as r
 	WHERE r.Date = (SELECT MAX(Date) from remotestation as r2 where r2.StationName = r.StationName AND r2.Date < "  .$q.  ")
 	ORDER by r.StationName ASC;";
 	
 	$result = mysqli_query($conn, $sql);
 	$resultCheck = mysqli_num_rows($result);
-	echo "StationName,Latitude,Longitude,Humidity,Date\n";
+	echo "StationName,Latitude,Longitude,Voltage%,Date\n";
 	if ($resultCheck > 0) {
 	    while($row = mysqli_fetch_assoc($result)) {
-	        echo $row['StationName'] ."," . $row["Latitude"] . "," . $row["Longitude"] ."," . $row["Humidity"] . "," . $row["Date"] . "\n";
+	        echo $row['StationName'] ."," . $row["Latitude"] . "," . $row["Longitude"] ."," . $row["Battery %"] . "," . $row["Date"] . "\n";
 	   }
 	}
 		else{
