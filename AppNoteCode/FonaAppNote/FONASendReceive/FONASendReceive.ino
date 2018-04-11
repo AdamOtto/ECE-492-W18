@@ -49,7 +49,7 @@ void loop() {
       fona.deleteSMS(slot); //Delete Message
 
       Serial.print("Message length: ");
-      Serial.print(smslen); 
+      Serial.println(smslen); 
       Serial.println(smsBuffer);
       Serial.print("From:");
       Serial.println(callerIDBuffer);

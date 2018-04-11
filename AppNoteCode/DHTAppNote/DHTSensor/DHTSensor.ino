@@ -19,4 +19,5 @@ void loop() {
 
   Serial.print("Temperature(*C): "); Serial.println(temp);
   Serial.print("Humidity(%): "); Serial.println(hum);
+  delay(15000);
 }
