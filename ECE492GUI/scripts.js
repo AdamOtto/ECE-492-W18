@@ -186,24 +186,25 @@ function initContent(header, body) {
                     markerColor = 'http://maps.google.com/mapfiles/ms/icons/red-dot.png';
                 }
             }
-             if (HumidPressed == true) {
+            if (HumidPressed == true) {
+                 console.log("inside humid");   
                  var humidCol = findHumidCol(csvHeader);
                  tempPressed = false;
                  voltPressed = false;
                  PmPressed = false
-                console.log("the tempcol is: " + tempcol);
+                console.log("the humid is: " + humidCol);
                  var humididty = parseInt(body[row][humidCol]);
 
                  if (humididty <= 60) {
                     markerColor = 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
                 }
-                 if ((70 > humididty) && (humididty > 60)) {
+                 if ((70 > humididty) && (humididty >= 60)) {
                     markerColor = 'http://maps.google.com/mapfiles/ms/icons/ltblue-dot.png';
                 }
-                 if ((80 > humididty) && (humididty > 70)) {
+                 if ((80 > humididty) && (humididty >= 70)) {
                     markerColor = 'http://maps.google.com/mapfiles/ms/icons/green-dot.png';
                 }
-                 if ((humididty > 80) && (humididty < 90)) {
+                 if ((humididty >= 80) && (humididty < 90)) {
                     markerColor = 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png';
                 }
                  if ((humididty >= 90) && (humididty < 100)) {
@@ -217,7 +218,7 @@ function initContent(header, body) {
                  var voltCol = findVolCol(csvHeader);
                 tempPressed = false;
                 HumidPressed = false;
-                PmPressed = false;
+                PmPressed1 = false;
                 console.log("the voltage column is: " + voltCol);
                 var voltage = parseInt(body[row][voltCol]);
 
@@ -337,9 +338,13 @@ function filterTemp(){
         "<img src =" + "'temp_scale.png'" +"alt = " + "temp scale" +"width=" + "'150px'" + "height=" + "'330px'" + "align=" + "right>";
 	time = new Date(time.getTime());
 	dt = time.toISOString().slice(0, 19).replace('T', ' ');
-	document.getElementById('textDate').value = dt;
-	callServerTemp(time);
+    document.getElementById('textDate').value = dt;
+    HumidPressed = false;
     tempPressed = true;
+    voltPressed = false;
+    PmPressed1 = false
+    PmPressed2 = false
+	callServerTemp(time);
 
 }
 /**
@@ -385,10 +390,13 @@ function filterVolt() {
     time = new Date(time.getTime());
     dt = time.toISOString().slice(0, 19).replace('T', ' ');
     document.getElementById('textDate').value = dt;
-
+    HumidPressed = false;
+    tempPressed = false;
+    voltPressed = true;
+    PmPressed1 = false
+    PmPressed2 = false
     document.getElementById("image").innerHTML =
         "<img src =" + "'voltage_scale.png'" + "alt = " + "temp scale" + "width=" + "'150px'" + "height=" + "'330px'" + "align=" + "right>";
-    voltPressed = true;
     callServerVolt(time)
 }
 
@@ -437,6 +445,10 @@ function filterHumid() {
     dt = time.toISOString().slice(0, 19).replace('T', ' ');
     document.getElementById('textDate').value = dt;
     HumidPressed = true;
+    tempPressed = false;
+    voltPressed = false;
+    PmPressed1 = false
+    PmPressed2 = false
     callServerHumid(time)
 }
 
@@ -571,6 +583,7 @@ function findPMCol2(csvHeader) {
  */
 function checklastcall(csvContent, dateCol) {
     time = new Date();
+    console.log("the time is: " + time);
     var ErrorStations = []
     for (var i = 0; i < csvContent.length-1; i++) {
         splitDateFormat = csvContent[i][dateCol].split(" "); 
@@ -579,13 +592,14 @@ function checklastcall(csvContent, dateCol) {
         if ((time.getFullYear() - splitYearMonthDate[0]) == 0) {
             if (((time.getMonth() + 1) - splitYearMonthDate[1]) == 0) {
                 if ((time.getDate() - splitYearMonthDate[2]) == 0) {
-                    if ((time.getHours()- splitHourMinSec[0]) == 0) {
-                        if ((time.getMinutes() - splitHourMinSec[1]) <= 10) {}
-                        else {
-                            ErrorStations.push(csvContent[i]);
-                        }
-                    }
+                    console.log(splitHourMinSec);
+                    console.log(splitDateFormat[1] * 3600);
+
+
+                    if ((time.getHours() - splitHourMinSec[0]) == 0 || (time.getHours() - splitHourMinSec[0]) == 1) {}
                     else {
+                        console.log("the error at the minutes is: " + time.getHours());
+                        console.log("the error at the minutes is:" + splitHourMinSec[0]);
                         ErrorStations.push(csvContent[i]);
                     }
                 }
@@ -636,6 +650,10 @@ function filterPM(){
     document.getElementById("image").innerHTML =
         "<img src =" + "'PM_scale.png'" + "alt = " + "temp scale" + "width=" + "'150px'" + "height=" + "'330px'" + "align=" + "right>";
     PmPressed1 = true;
+    HumidPressed = false;
+    tempPressed = false;
+    voltPressed = false;
+    PmPressed2 = false
 	callServerPM(time);
 }
 
@@ -650,6 +668,10 @@ function filterPM2() {
     document.getElementById("image").innerHTML =
         "<img src =" + "'PM_scale.png'" + "alt = " + "temp scale" + "width=" + "'150px'" + "height=" + "'330px'" + "align=" + "right>";
     PmPressed2 = true;
+    HumidPressed = false;
+    tempPressed = false;
+    voltPressed = false;
+    PmPressed1 = false
 	callServerPM2(time);
 }
 
@@ -665,7 +687,10 @@ function filterShowAll() {
     document.getElementById('textDate').value = dt;
     FilterType = "ShowAll"
     tempPressed = true;
-
+    HumidPressed = false;
+    voltPressed = false;
+    PmPressed1 = false
+    PmPressed2 = false
     callServerTime(time,FilterType);
 }
 
