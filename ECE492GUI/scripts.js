@@ -37,6 +37,7 @@ function init(){
 	console.log("init started...");
 
 	time = new Date();
+	console.log(time);
 	slideShowEndTime = time = new Date(time.setHours(time.getHours() - 6));
 	slideShowStartTime = new Date();
 	slideShowStartTime = new Date(slideShowStartTime.setHours(time.getHours() - 24));	
