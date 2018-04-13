@@ -1,3 +1,11 @@
+/**
+ * This library is taken from https://github.com/dantudose/SM-PWM-01A
+ * and slightly modified to work with our system.
+ * The changes are simply related to which pins the sensors use to communicate
+ * their data. The pins have been changed from 4 and 5 to 9 and 10.
+ * -Ken Hidalgo
+ **/
+
 //
 // Use interrupts to time low pulse occupancy because this class of devices notoriously 
 // returns zeros at low concentrations. Using pulseIn(pin, LOW) can cause blocking 
@@ -65,10 +73,9 @@ void SMPWM01A::begin() {
 
 
 
-/*ISR(PCINT0_vect) {
+ISR(PCINT0_vect) {
  SMPWM01A::PCINT2_ISR();
-  
-} */
+} 
 
 
 void SMPWM01A::PCINT2_ISR() {

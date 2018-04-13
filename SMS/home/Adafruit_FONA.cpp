@@ -1,3 +1,10 @@
+/**
+ * This is the same FONA library found on the adafruit github
+ * but with some new additions in the form of a getSMSDate
+ * and getSMSTime method
+ * -Ken Hidalgo
+ */
+
 /***************************************************
   This is a library for our Adafruit FONA Cellular Module
 
@@ -561,6 +568,12 @@ boolean Adafruit_FONA::getSMSSender(uint8_t i, char *sender, int senderlen) {
   return result;
 }
 
+/**
+ * The following two methods were created to get the date 
+ * and time from the sms notification string. They perform in
+ * a similar manner to the getSMSSender method from above.
+ * -Ken Hidalgo
+ */
 boolean Adafruit_FONA::getSMSDate(uint8_t i, char *date, int datelen) {
   // Ensure text mode and all text mode parameters are sent.
   if (! sendCheckReply(F("AT+CMGF=1"), ok_reply)) return false;

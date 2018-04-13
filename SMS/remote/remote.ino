@@ -1,39 +1,50 @@
 /*
  * Created by: Ken Hidalgo
- * Code for testing the remote station using SMS
+ * Code for the remote station using SMS
+ * 
+ * Remote stations poll their sensors and send the received data
+ * to the home station once every defined period. (Default 1 minute)
+ * Remote stations will resend their data at least two more times if
+ * they do not receive an acknowledgment message within a 30 second window.
+ * After receiving an acknowledgment, remote stations go to sleep
+ * until it is time to send data again.
+ * 
+ * Remote stations polling frequency can be updated by receiving a message from
+ * the home station.
 */
 #include "DHT.h"
 #include "Adafruit_FONA.h"
 #include "SMPWM01A.h"
+#include "SoftwareSerial.h" //Use the version included in this directory
 #include <avr/sleep.h>
 
-
+//FONA Shield Pin Constants
 #define FONA_RX 2
 #define FONA_TX 3
 #define FONA_RST 4
 
-// Constants
-#define RI_PIN 12
+//Temp/Hum Sensor Constants
 #define DHTPIN 8     // Temp & Humid Sensor
 #define DHTTYPE DHT22   // DHT 22 signal pin
-//#define HOME_PHONE "+17808500725" //Ken's Cell Phone Number
+
+//Home Station Phone Number
 #define HOME_PHONE "+17809944626"
 #define PINNUMBER "" //SIM card PIN number
 #define MAXTRIES 2
 
-#include "SoftwareSerial.h"
+//FONA object initialization
 SoftwareSerial fonaSS = SoftwareSerial(FONA_TX, FONA_RX);
 SoftwareSerial *fonaSerial = &fonaSS;
-
 Adafruit_FONA fona = Adafruit_FONA(FONA_RST);
 
-DHT dht(DHTPIN, DHTTYPE); // Instantiate dht
+//Sensor object initialization
+DHT dht(DHTPIN, DHTTYPE);
 SMPWM01A dust;
 
-volatile int interval = 1; // Interval in mins
-volatile int sleep_total = (interval*60)/8; // 
+//Global variables needed for sleep interrupts
+volatile int interval = 1; //Interval in mins
+volatile int sleep_total = (interval*60)/8; //Arduino sleeps for 8 seconds at a time, count is taken every time it wakes 
 volatile int sleep_count = 0;
-int stateRI = HIGH;
 
 void setup() {
   watchdogOn();
@@ -50,15 +61,18 @@ void setup() {
     while(1);
   }
 
-  fonaSerial->print("AT+CNMI=2,1\r\n");
-  fona.enableGPS(true);
-  while(fona.available()){}
+  fonaSerial->print("AT+CNMI=2,1\r\n"); //Makes FONA print SMS notification
+  fona.enableGPS(true); //Turns on GPS locator
+  //while(fona.available()){}
 }
 
+/**
+ * Polls sensors for values and sends data string to given phone number
+ **/
 void sendSMS(char* Phone){
    //floating point variables to hold sensor values
-    float hum;  //Stores humidity value
-    float temp; //Stores temperature value
+    float hum;  
+    float temp; 
     float dust2; 
     float dust10;
     float lat;
@@ -73,17 +87,21 @@ void sendSMS(char* Phone){
     char lt[15];
     char ln[15];
     char b[11];
-  
-    //Update sensor values here
+    
+    delay(10000);//wait 10 seconds for sensors to stabilize
+    
+    //Update sensor values
     hum = dht.readHumidity();
     temp = dht.readTemperature();
     dust2 = dust.getPM2();
     dust10 = dust.getPM10();
     fona.getBattPercent(&batt);
-    if(!(fona.getGSMLoc(&lat, &lon))){//If no GPS signal default to University location
+    if(!(fona.getGPS(&lat, &lon))){//If no GPS signal default to University location
       lat = 53.523219;
       lon = -113.526319;
+      Serial.print("Failed to get GPS");
     }
+    
     //convert floating point values to strings
     dtostrf(hum, 10, 1, h);
     dtostrf(temp, 10, 1, t);
@@ -96,85 +114,68 @@ void sendSMS(char* Phone){
     char txtmsg[100];
     //Package and Send
     snprintf(txtmsg, sizeof(txtmsg), "D,%s,%s,%s,%s,%s,%s,%s",lt,ln,t,d10,d2,h,b);
-    //snprintf(txtmsg, sizeof(txtmsg), "D,50,-100,25,50,50,26.5,80");
     fona.sendSMS(Phone, txtmsg);
 }
 
+/**
+ * Extracts a received SMS message from the notification string.
+ * Deletes the message once extracted.
+ */
 void extractSMS(char* smsBuffer, char* fonaNotificationBuffer){      
   char* bufPtr = fonaNotificationBuffer;
-  //if (fona.available()){
-    int slot = 0;            
-    int charCount = 0;
-    
-    do  {
-      *bufPtr = fona.read();
-      Serial.write(*bufPtr);
-      delay(1);
-    } while ((*bufPtr++ != '\n') && (fona.available()) && (++charCount < (64-1)));
-    
-    //Add a terminal NULL to the notification string
-    *bufPtr = 0;
+  int slot = 0;            
+  int charCount = 0;
 
-    //Scan the notification string for an SMS received notification.
-    //  If it's an SMS message, we'll get the slot number in 'slot'
-    if (1 == sscanf(fonaNotificationBuffer, "+CMTI: " FONA_PREF_SMS_STORAGE ",%d", &slot)) {
-      Serial.print("slot: "); Serial.println(slot);
+  //Read in the notification string
+  do  {
+    *bufPtr = fona.read();
+    Serial.write(*bufPtr);
+    delay(1);
+  } while ((*bufPtr++ != '\n') && (fona.available()) && (++charCount < (64-1)));
     
-      char callerIDbuffer[32];  //we'll store the SMS sender number in here
-      
-      // Retrieve SMS sender address/phone number.
-      if (! fona.getSMSSender(slot, callerIDbuffer, 31)) {
-        Serial.println("Didn't find SMS message in slot!");
-      }
-      Serial.print(F("FROM: ")); Serial.println(callerIDbuffer);
+  //Add a terminal NULL to the notification string
+  *bufPtr = 0;
 
-        // Retrieve SMS value.
-        uint16_t smslen;
-        if (fona.readSMS(slot, smsBuffer, 250, &smslen)) { // pass in buffer and max len!
-          Serial.println("SMS stored");
-        }
-        
-      // delete the original msg after it is processed
-      //   otherwise, we will fill up all the slots
-      //   and then we won't be able to receive SMS anymore
-      if (fona.deleteSMS(slot)) {
-        Serial.println(F("OK!"));
-      } else {
-        Serial.print(F("Couldn't delete SMS in slot ")); Serial.println(slot);
-        fona.print(F("AT+CMGD=?\r\n"));
-      }
-    }
-  //}
+  //Read the notification string for a SMS received flag, only continue if it is there
+  if (1 == sscanf(fonaNotificationBuffer, "+CMTI: " FONA_PREF_SMS_STORAGE ",%d", &slot)) {
+    //pass in appropriate buffers and max lengths
+    uint16_t smslen;
+    fona.readSMS(slot, smsBuffer, 250, &smslen);
+    fona.deleteSMS(slot);//Remember to delete the message once done!
+  }
 }
 
 void loop() {
   goToSleep();
-  if (sleep_count >= sleep_total){
+  if (sleep_count >= sleep_total){//Time to wake up!
     sleep_count = 0;
     char smsBuffer[250];
     char notifBuffer[64];
     bool AckRec = false;
     int trycount = 0;
-    sendSMS(HOME_PHONE);
-    memset(smsBuffer, NULL, sizeof(smsBuffer));
-    while(fona.available()){ //Check for delay changes
-        extractSMS(smsBuffer, notifBuffer);
-        if (smsBuffer[0]=='T'){
+    
+    while(fona.available()){//check for interval changes
+      memset(smsBuffer, NULL, sizeof(smsBuffer)); //Clear out any old messages
+      extractSMS(smsBuffer, notifBuffer);
+        if (smsBuffer[0]=='T'){//Interval change message from home station
           interval = atoi(&smsBuffer[2]);
           sleep_total = (interval*60)/8;
           Serial.print("New interval: ");
           Serial.println(interval);
         }
-      }
-    while((!(AckRec))&&(trycount<MAXTRIES)){
-      delay(30000);
-      memset(smsBuffer, NULL, sizeof(smsBuffer));
+    }
+    
+    sendSMS(HOME_PHONE); //Poll sensors and send data
+    
+    while((!(AckRec))&&(trycount<MAXTRIES)){//Wait for acknowledgment or timeout
+      delay(30000); //30 seconds between each resend
+      memset(smsBuffer, NULL, sizeof(smsBuffer)); //Clear out any old messages
       while(fona.available()){
         extractSMS(smsBuffer, notifBuffer);
         if (smsBuffer[0]=='A'){
           AckRec = true;
           Serial.print("Ack Received");
-        }else if (smsBuffer[0]=='T'){
+        }else if (smsBuffer[0]=='T'){//Not an ack but a frequency update
           interval = atoi(&smsBuffer[2]);
           sleep_total = (interval*60)/8;
           Serial.print("New interval: ");
@@ -189,15 +190,22 @@ void loop() {
   }
 }
 
+/**
+ * An Arduino Uno can only be put to sleep for about 8 seconds at a time.
+ * To make it sleep for longer we make use of a watchdog timer that will increment
+ * a count everytime the Arduino wakes.
+ * 
+ * The code for the sleep method and watchdog timer is taken from here:
+ * //http://www.fiz-ix.com/2012/11/low-power-arduino-using-the-watchdog-timer/
+ */
 void goToSleep()   {
   set_sleep_mode(SLEEP_MODE_PWR_DOWN); // Set sleep mode.
-  PCMSK0 |= (1<<PCINT4);
   sleep_enable(); // Enable sleep mode.
   sleep_mode(); // Enter sleep mode.
-  PCMSK0 |= ~(1<<PCINT4);
   sleep_disable(); // Disable sleep mode after waking.
 }
 
+//Clears any reset flags and enable watchdog interrupt
 void watchdogOn() { 
   MCUSR = MCUSR & B11110111;
   WDTCSR = WDTCSR | B00011000; 
@@ -208,19 +216,4 @@ void watchdogOn() {
 
 ISR(WDT_vect){
   sleep_count ++; 
-}
-
-//http://www.fiz-ix.com/2012/11/low-power-arduino-using-the-watchdog-timer/
-
-ISR(PCINT0_vect) {
- if (stateRI != digitalRead(RI_PIN)){ 
-   if ((stateRI = digitalRead(RI_PIN)) == LOW){
-    sleep_disable();
-    PCMSK0 |= ~(1<<PCINT4);
-    sleep_count = sleep_total;
-    }
- } 
- else{
-  dust.PCINT2_ISR();
- }
 }
