@@ -1,3 +1,11 @@
+/**
+ * This library is taken from https://github.com/dantudose/SM-PWM-01A
+ * and slightly modified to work with our system.
+ * The changes are simply related to which pins the sensors use to communicate
+ * their data. The pins have been changed from 4 and 5 to 9 and 10.
+ * -Ken Hidalgo
+ **/
+
 //
 // Use interrupts to time low pulse occupancy because this class of devices notoriously 
 // returns zeros at low concentrations. Using pulseIn(pin, LOW) can cause blocking 
@@ -43,7 +51,7 @@ void SMPWM01A::begin() {
   // set up Timer 1
   TCCR1A = 0;          							// normal operation
   TCCR1B = (1<<WGM12)|(1<<CS10)|(1<<CS12);   	// CTC, scale to clock / 1024
-  OCR1A  = 62500;       						// compare A register value (62500 * clock speed / 1024)
+  OCR1A  = 62500*7.5;       						// compare A register value (62500 * clock speed / 1024)
   TIMSK1 = 1<<OCIE1A;             				// interrupt on Compare A Match
 
   // Enable pin change interrupt
@@ -65,10 +73,9 @@ void SMPWM01A::begin() {
 
 
 
-//ISR(PCINT2_vect) {
- //SMPWM01A::PCINT2_ISR();
-  
-//} 
+ISR(PCINT0_vect) {
+ SMPWM01A::PCINT2_ISR();
+} 
 
 
 void SMPWM01A::PCINT2_ISR() {

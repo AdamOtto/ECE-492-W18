@@ -1,27 +1,44 @@
 /*
- * Created by Ken Hidalgo and Qikai Lu
- * Code for the home station using SMS
- * This implementation simply waits for a message from a remote station
- * and records it to an SD card. If there is no message to save then it will
- * send a request message to a remote station.
- * Currently has not been tested. Can compile.
- */
+ * Created by: Ken Hidalgo
+ * Code for the home station.
+ * 
+ * Home station waits for messages from remote stations.
+ * Upon receiving a message it replys with an acknowledgment.
+ * The received message is saved to a CSV file in the SD card and 
+ * it is also relayed to the host computer via the Serial Port.
+ * 
+ * Home station can also update the polling frequency of remote stations
+ * by sending each of them a message.
+*/
 #include "Adafruit_FONA.h"
 #include <SPI.h>
 #include <SD.h>
+#include <SoftwareSerial.h>
 
-const int chipSelect = 10;
-
+//FONA Shield Pin Constants
 #define FONA_RX 2
 #define FONA_TX 3
 #define FONA_RST 4
 
-#define PINNUMBER "" //SIM card PIN number
+//SIM Card pin number (if any)
+#define PINNUMBER ""
 
-#include "SoftwareSerial.h"
+//Chipselect pin for data logging shield
+#define CHIPSELECT 10
+
+/** 
+ * The phone numbers of the remote stations are saved here 
+ * as a temporary workaround for polling frequency updates.
+ * Ideally these would be pulled from the databases and sent
+ * to the Arduino through the serial port, but we were experiencing
+ * too many issues with that method.
+ */ 
+const char phonebook[][12] = {"17809944628", "17809944630"};
+const int num_stations = 2;
+
+//FONA object initialization
 SoftwareSerial fonaSS = SoftwareSerial(FONA_TX, FONA_RX);
 SoftwareSerial *fonaSerial = &fonaSS;
-
 Adafruit_FONA fona = Adafruit_FONA(FONA_RST);
 
 void setup() {
@@ -35,86 +52,150 @@ void setup() {
     Serial.println(F("Couldn't find FONA"));
     while(1);
   }
-  
-  if (!SD.begin(chipSelect)) {
+
+  if (!SD.begin(CHIPSELECT)) {
     Serial.println("Card failed, or not present");
-    // don't do anything more:
     while(1);
   }
-  fonaSerial->print("AT+CNMI=2,1\r\n");
+  
+  fonaSerial->print("AT+CNMI=2,1\r\n"); //Makes FONA print SMS notification
+  fileDump();
+  clearSlots(); //Clear out any old messages so the station can continue receiving more
 }
 
+/**
+ * Sends an acknowledgment message to the given phone number
+ * For simplicity sake, acknowledgment message is a single character, A
+ */
+void ackSMS(char* PhoneNum){
+    fona.sendSMS(PhoneNum, "A");
+}
 
-void loop() {
-  char fonaNotificationBuffer[64];          
-  char smsBuffer[250];
-  char* bufPtr = fonaNotificationBuffer;    
-  
-  if (fona.available())      
-  {
-    int slot = 0;            
-    int charCount = 0;
+/**
+ * Sends the freqSMS to the given phone number
+ */
+void changefreqSMS(char* PhoneNum, char* freqSMS){
+    fona.sendSMS(PhoneNum, freqSMS);
+}
+
+/**
+ * Extracts a received SMS message from the notification string.
+ * Able to grab the message, sender's phone number, as well as date and time of received message.
+ * Deletes the message once extracted.
+ */
+void extractSMS(char* smsBuffer, char* fonaNotificationBuffer, char* callerIDbuffer, char* date, char* smstime){      
+  char* bufPtr = fonaNotificationBuffer;
+  int slot = 0;            
+  int charCount = 0;
+
+  //Read in the notification string
+  do  {
+    *bufPtr = fona.read();
+    Serial.write(*bufPtr);
+    delay(1);
+  } while ((*bufPtr++ != '\n') && (fona.available()) && (++charCount < (64-1)));
     
-    do  {
-      *bufPtr = fona.read();
-      Serial.write(*bufPtr);
-      delay(1);
-    } while ((*bufPtr++ != '\n') && (fona.available()) && (++charCount < (sizeof(fonaNotificationBuffer)-1)));
+  //Add a terminal NULL to the notification string
+  *bufPtr = 0;
+
+  //Look through the notification buffer for a SMS received flag, only continue if it is there
+  if (1 == sscanf(fonaNotificationBuffer, "+CMTI: " FONA_PREF_SMS_STORAGE ",%d", &slot)) {
     
-    //Add a terminal NULL to the notification string
-    *bufPtr = 0;
-
-    //Scan the notification string for an SMS received notification.
-    //  If it's an SMS message, we'll get the slot number in 'slot'
-    if (1 == sscanf(fonaNotificationBuffer, "+CMTI: " FONA_PREF_SMS_STORAGE ",%d", &slot)) {
-      Serial.print("slot: "); Serial.println(slot);
-      
-      char callerIDbuffer[32];  //we'll store the SMS sender number in here
-      
-      // Retrieve SMS sender address/phone number.
-      if (! fona.getSMSSender(slot, callerIDbuffer, 31)) {
-        Serial.println("Didn't find SMS message in slot!");
-      }
-      Serial.print(F("FROM: ")); Serial.println(callerIDbuffer);
-
-        // Retrieve SMS value.
-        uint16_t smslen;
-        if (fona.readSMS(slot, smsBuffer, 250, &smslen)) { // pass in buffer and max len!
-          Serial.println("SMS stored");
-        }
-
-      //Send back an automatic response
-      Serial.println("Sending reponse...");
-      if (!fona.sendSMS(callerIDbuffer, "ACK")) {
-        Serial.println(F("Failed"));
-      } else {
-        Serial.println(F("Sent!"));
-      }
-      
-      // delete the original msg after it is processed
-      //   otherwise, we will fill up all the slots
-      //   and then we won't be able to receive SMS anymore
-      if (fona.deleteSMS(slot)) {
-        Serial.println(F("OK!"));
-      } else {
-        Serial.print(F("Couldn't delete SMS in slot ")); Serial.println(slot);
-        fona.print(F("AT+CMGD=?\r\n"));
-      }
-
-      File dataFile = SD.open("datalog.csv", FILE_WRITE);
-
-      // if the file is available, write to it:
-      if (dataFile) {
-        dataFile.println(smsBuffer);
-        dataFile.close();
-        // print to the serial port too:
-        Serial.println(smsBuffer);
-      }
-    }
-  }else{
-    //To be changed later
-    char * REMOTE_PHONE = "+17805555555";
-    char * rq_msg = "REQ";
-    fona.sendSMS(REMOTE_PHONE, rq_msg);
+    //Pass in appropriate buffers and max lengths
+    fona.getSMSSender(slot, callerIDbuffer, 31);
+    fona.getSMSDate(slot,date,9);
+    fona.getSMSTime(slot,smstime,12);
+    memset(smstime+8, 0, 3); //Remove the -24 or -12 from the end of time string
+    uint16_t smslen;
+    fona.readSMS(slot, smsBuffer, 100, &smslen);
+    fona.deleteSMS(slot); //Remember to delete the message once done!
   }
 }
+
+void loop() {
+  //Please note that larger buffer lengths may cause the system to run
+  //out of memory and therefore malfunction
+  char smsBuffer[100];
+  char notifBuffer[64];
+  char callerIDBuffer[32];
+  char date[9];
+  char smstime[12];
+  delay(1000);
+  if (fona.available()){
+    memset(smsBuffer, 0, sizeof(smsBuffer)); //Clear out any old messages
+    extractSMS(smsBuffer, notifBuffer, callerIDBuffer,date,smstime);
+    if(smsBuffer[0]=='D'){//Data from a home station was received
+      ackSMS(callerIDBuffer); //Send back an acknowledgement
+
+      //Open up the CSV on the SD card and save the data string there
+      File datafile = SD.open("datalog.csv", FILE_WRITE);
+      if (datafile){
+        datafile.print(callerIDBuffer);
+        datafile.print(",");
+        datafile.print(smsBuffer+2);
+        datafile.print(",");
+        datafile.print("\"");
+        datafile.print(date);
+        datafile.print(" ");
+        datafile.print(smstime);
+        datafile.println("\"");
+        datafile.close();
+      }
+       //Print the data string to the Serial port in the required form
+       Serial.print("?");
+       Serial.print(callerIDBuffer+1);
+       Serial.print(",");
+       Serial.print(smsBuffer+2);
+       Serial.print(",");
+       Serial.print("\"");
+       Serial.print(date);
+       Serial.print(" ");
+       Serial.print(smstime);
+       Serial.print("\"");
+       Serial.print("!");
+       Serial.println("\n");
+    }
+  }
+  if(Serial.available()){//Message from the host computer to update polling frequency
+    String buffer;
+    buffer = Serial.readStringUntil('\n');
+    if (buffer[0]=='T'){
+      int i;
+      char arr[buffer.length()+1];
+      buffer.toCharArray(arr, buffer.length()+1);
+      for (i=0; i<num_stations; i++){
+        changefreqSMS(phonebook[i], arr); 
+      }
+    }
+  }
+}   
+
+/**
+ * Opens up the CSV in the SD card and prints out the content to the serial port.
+ */
+void fileDump(){
+  File datafile = SD.open("datalog.csv", FILE_READ);
+   if (datafile) {
+    while (datafile.available()) {
+      String buffer;
+      Serial.print("?");
+      buffer = datafile.readStringUntil('\n');
+      buffer[0]=' ';//Database doesn't like the "+" in front of phone numbers
+      buffer.remove(buffer.length()-1);//Remove the newline character
+      Serial.print(buffer);
+      Serial.println("!");
+    }
+    datafile.close();
+  }
+}
+
+/**
+ * Clears out all SMS slots of FONA
+ */
+void clearSlots(){
+  int i = 0;
+  for (i=1; i<=50; i++){
+    fona.deleteSMS(i); 
+  }
+}
+
