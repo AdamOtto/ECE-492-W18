@@ -1,9 +1,9 @@
 <?php
 	header("Access-Control-Allow-Origin: *");
 	$servername = "localhost";
-	$username = "ahnguyen_local";
-	$password = "123";
-	$dbname = "ahnguyen_comp466part2";
+	$username = "id5126683_rootuser";
+	$password = "groot";
+	$dbname = "id5126683_ece492database";
 	/*$q = intval($_GET['q']);*/
 	// Create connection
 	$conn = mysqli_connect($servername, $username, $password, $dbname);
@@ -12,7 +12,7 @@
 	if (!$conn) {
 	    die("Connection failed: " . mysqli_error($conn));
 	}
-	mysqli_select_db($conn, "ahnguyen_comp466part2");
+	mysqli_select_db($conn, "id5126683_ece492database");
 	
 	$sql = "SELECT DISTINCT *
 	FROM remotestation as r

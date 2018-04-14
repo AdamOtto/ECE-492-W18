@@ -1054,7 +1054,7 @@ function parseDateString(datestr){
 	newTime.setFullYear( datestr.substring(0,4) );
 	newTime.setMonth( (datestr.substring(5,7)) - 1 );
 	newTime.setDate( parseInt(datestr.substring(8,10)) -  1 );
-	if (parseInt(datestr.substring(8,10)) != newTime.getDate()){
+	if (parseInt(datestr.substring(8,10)) < newTime.getDate()){
 	    newTime.setDate( parseInt(datestr.substring(8,10)) );
 	}
 	newTime.setUTCHours( datestr.substring(11,13) );
