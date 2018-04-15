@@ -1032,9 +1032,12 @@ function parseDateString(datestr){
 	var newTime = new Date();
 	newTime.setFullYear( datestr.substring(0,4) );
 	newTime.setMonth( (datestr.substring(5,7)) - 1 );
-	newTime.setDate( parseInt(datestr.substring(8,10)) -  1 );
+	newTime.setDate( parseInt(datestr.substring(8,10)));
+
 	if (parseInt(datestr.substring(8,10)) < newTime.getDate()){
-	    newTime.setDate( parseInt(datestr.substring(8,10)) );
+
+	    newTime.setDate( parseInt(datestr.substring(8,10)) - 1);
+
 	}
 	newTime.setUTCHours( datestr.substring(11,13) );
 	newTime.setUTCMinutes( datestr.substring(14,16) );
